@@ -6,7 +6,8 @@
 
 This is a lightweight replacement for the Logitech driver of the Logitech G Flight Simulator Cockpit Radio Panel.
 Works with Microsoft Flight Simulator 2020 (FS2020 / MSFS).
-Similar to SPAD.neXt.
+
+Inspired by SPAD.neXt.
 
 ### Features
 * **complete** - all default features
