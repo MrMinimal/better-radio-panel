@@ -1,12 +1,11 @@
 use std::convert::TryInto;
 
-use crate::radio_device::SaitekRadioPanel;
-use crate::radio_states::*;
+use radio_panel::{
+    device::{InputState, RadioPanel},
+    input_states::{ButtonState, ModeSelectorState, RotaryState},
+};
 
-mod radio_constants;
-mod radio_device;
-mod radio_display;
-mod radio_states;
+mod radio_panel;
 
 enum Window {
     TopLeft,
@@ -43,7 +42,7 @@ struct ModeStates {
 }
 
 fn main() {
-    let mut radio_panel = SaitekRadioPanel::new();
+    let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
 
     let mut mode_states_upper = ModeStates {
@@ -152,11 +151,11 @@ fn main() {
 }
 
 fn xpdr_logic(
-    input: radio_device::InputState,
+    input: InputState,
     xpdr_state: &mut XpdrState,
     window_active: Window,
     window_standby: Window,
-    radio_panel: &mut SaitekRadioPanel,
+    radio_panel: &mut RadioPanel,
 ) {
     if matches!(input.button_upper, ButtonState::Pressed) {
         xpdr_state.selected_digit += 1;
@@ -196,18 +195,18 @@ fn xpdr_logic(
     radio_panel.update_all_displays();
 }
 
-fn dme_logic(radio_panel: &mut SaitekRadioPanel, window_active: Window, window_standby: Window) {
+fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby: Window) {
     radio_panel.set_window(window_active as usize, "   0.0");
     radio_panel.set_window(window_standby as usize, "    0");
     radio_panel.update_all_displays();
 }
 
 fn frequency_logic(
-    input: radio_device::InputState,
+    input: InputState,
     frequency_state: &mut FrequencyState,
     window_active: Window,
     window_standby: Window,
-    radio_panel: &mut SaitekRadioPanel,
+    radio_panel: &mut RadioPanel,
 ) {
     if matches!(input.button_upper, ButtonState::Pressed) {
         swap_frequencies(frequency_state);
@@ -255,7 +254,7 @@ fn swap_frequencies(frequency_state: &mut FrequencyState) {
 }
 
 /// Show only dashes to indicate no data recieved from sim yet
-fn show_standby_screen(radio_panel: &mut SaitekRadioPanel) {
+fn show_standby_screen(radio_panel: &mut RadioPanel) {
     radio_panel.set_window(0, "    -");
     radio_panel.set_window(1, "    -");
     radio_panel.set_window(2, "    -");

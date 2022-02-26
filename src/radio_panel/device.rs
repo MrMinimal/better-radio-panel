@@ -1,10 +1,11 @@
-use crate::{
-    radio_constants::*,
-    radio_display::{SaitekRadioPanelWindow, SevenSegmentDisplay},
-    radio_states::*,
-};
 use hidapi::{HidApi, HidDevice};
 use std::process;
+
+use super::{
+    constants::*,
+    hardware::{RadioPanelWindow, SevenSegmentDisplay},
+    input_states::{ButtonState, ModeSelectorState, RotaryState},
+};
 
 const VENDOR_ID: u16 = 0x06a3; // Saitek
 const PRODUCT_ID: u16 = 0x0d05; // Radio Panel
@@ -24,22 +25,22 @@ pub struct InputState {
 }
 
 /// Represents the radio panel with its 4 windows, containing 5 7-segment displays each.
-pub struct SaitekRadioPanel {
+pub struct RadioPanel {
     hid_device: HidDevice,
-    windows: [SaitekRadioPanelWindow; 4],
+    windows: [RadioPanelWindow; 4],
 }
 
-impl SaitekRadioPanel {
-    pub fn new() -> SaitekRadioPanel {
-        SaitekRadioPanel {
+impl RadioPanel {
+    pub fn new() -> RadioPanel {
+        RadioPanel {
             hid_device: HidApi::new()
                 .unwrap()
                 .open(VENDOR_ID, PRODUCT_ID)
                 .unwrap_or_else(|_error| {
-                    println!("Couldn't connect to Saitek Radio Panel. Is it plugged in? Do you have permissions to access it?");
+                    println!("Couldn't connect to Radio Panel. Is it plugged in? Do you have permissions to access it?");
                     process::exit(1);
                 }),
-            windows: [SaitekRadioPanelWindow {
+            windows: [RadioPanelWindow {
                 displays: [SevenSegmentDisplay {
                     value: DIGIT_BLANK,
                     has_decimal_point: false,

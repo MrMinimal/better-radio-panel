@@ -1,4 +1,4 @@
-/// The Saitek Radio Panel has 4 windows with 5 7-segement displays each
+/// The Radio Panel has 4 windows with 5 7-segement displays each
 pub const DEVICE_WINDOW_COUNT: usize = 4;
 
 /// Each window has 5 7-segment displays
