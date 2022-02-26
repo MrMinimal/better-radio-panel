@@ -1,4 +1,5 @@
 [package]
+simconnect = "0.1.3"
 name = "better-radio-panel"
 version = "0.0.1"
 authors = ["Tom Langwaldt"]
@@ -8,6 +9,8 @@ edition = "2021"
 
 [dependencies]
 hidapi = "1.2.5"
+simconnect = "0.1.3"
+parse_int = "0.6.0"
 
 [profile.release]
 panic = 'abort'

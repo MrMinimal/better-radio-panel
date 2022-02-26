@@ -1,4 +1,11 @@
+use std::thread::sleep;
+use std::time::Duration;
+use std::mem::transmute_copy;
+
+
 use std::convert::TryInto;
+use parse_int::parse;
+use simconnect::{self, SimConnector};
 
 use radio_panel::{
     device::{InputState, RadioPanel},
@@ -41,7 +48,16 @@ struct ModeStates {
     xpdr_state: XpdrState,
 }
 
+struct DataStruct {
+  lat: f64,
+  lon: f64,
+  alt: f64,
+}
+
 fn main() {
+    let mut conn = simconnect::SimConnector::new();
+    conn.connect("Simple Program"); // Intialize connection with SimConnect
+
     let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
 
@@ -86,6 +102,9 @@ fn main() {
         },
     };
 
+    conn.map_client_event_to_sim_event(1000, "COM_STBY_RADIO_SET");
+    conn.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SWAP");
+
     loop {
         let input = radio_panel.wait_for_input();
         match input.mode_selector_upper {
@@ -96,6 +115,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &conn,
                 );
             }
             ModeSelectorState::ModeSelectorCom2 => {
@@ -105,6 +125,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &conn,
                 );
             }
             ModeSelectorState::ModeSelectorNav1 => {
@@ -114,6 +135,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &conn,
                 );
             }
             ModeSelectorState::ModeSelectorNav2 => {
@@ -123,6 +145,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &conn,
                 );
             }
             ModeSelectorState::ModeSelectorAdf => {
@@ -132,6 +155,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &conn,
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
@@ -207,9 +231,10 @@ fn frequency_logic(
     window_active: Window,
     window_standby: Window,
     radio_panel: &mut RadioPanel,
+    conn: &SimConnector
 ) {
     if matches!(input.button_upper, ButtonState::Pressed) {
-        swap_frequencies(frequency_state);
+        swap_frequencies(frequency_state, &conn);
     }
 
     // More consise variable names
@@ -229,7 +254,7 @@ fn frequency_logic(
         RotaryState::None => 0,
     };
 
-    standby_whole = wrap(standby_whole, 118, 135);
+    standby_whole = wrap(standby_whole, 118, 136);
     standby_fract = wrap(standby_fract, 0, 100);
     let active_frequency = format!("{:0>3}.{:0>2}", active_whole, active_fract);
     let standby_frequency = format!("{:0>3}.{:0>2}", standby_whole, standby_fract);
@@ -242,15 +267,23 @@ fn frequency_logic(
     frequency_state.standby_fractional_part = standby_fract;
     frequency_state.active_whole_part = active_whole;
     frequency_state.active_fractional_part = active_fract;
+
+    let standby_whole = format!("{:0>3}", standby_whole);
+    let standby_fract = format!("{:0>2}", standby_fract);
+    let standby_frequency = format!("0x{}{}", standby_whole, standby_fract);
+    let f = parse::<u32>(&standby_frequency).unwrap();
+    conn.transmit_client_event(1, 1000, f, 5, 0);
 }
 
-fn swap_frequencies(frequency_state: &mut FrequencyState) {
+fn swap_frequencies(frequency_state: &mut FrequencyState, conn: &SimConnector) {
     let previous_active_whole = frequency_state.active_whole_part;
     let previous_active_fract = frequency_state.active_fractional_part;
     frequency_state.active_whole_part = frequency_state.standby_whole_part;
     frequency_state.active_fractional_part = frequency_state.standby_fractional_part;
     frequency_state.standby_whole_part = previous_active_whole;
     frequency_state.standby_fractional_part = previous_active_fract;
+
+    conn.transmit_client_event(1, 1001, 0, 5, 0);
 }
 
 /// Show only dashes to indicate no data recieved from sim yet
