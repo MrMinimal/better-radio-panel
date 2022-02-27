@@ -55,8 +55,8 @@ struct DataStruct {
 }
 
 fn main() {
-    let mut conn = simconnect::SimConnector::new();
-    conn.connect("Simple Program"); // Intialize connection with SimConnect
+    let mut simulator = simconnect::SimConnector::new();
+    simulator.connect("Simple Program"); // Intialize connection with SimConnect
 
     let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
@@ -102,9 +102,11 @@ fn main() {
         },
     };
 
-    conn.map_client_event_to_sim_event(1000, "COM_RADIO_SET_HZ");
-    conn.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
-    conn.map_client_event_to_sim_event(1002, "COM_STBY_RADIO_SWAP");
+    // Tell simulator which event ID is supposed to represent what simulator event
+    simulator.map_client_event_to_sim_event(1000, "COM_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
 
     loop {
         let input = radio_panel.wait_for_input();
@@ -116,7 +118,9 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
-                    &conn,
+                    &simulator,
+                    1000,
+                    1001,
                 );
             }
             ModeSelectorState::ModeSelectorCom2 => {
@@ -126,7 +130,9 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
-                    &conn,
+                    &simulator,
+                    1002,
+                    1003,
                 );
             }
             ModeSelectorState::ModeSelectorNav1 => {
@@ -136,7 +142,9 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
-                    &conn,
+                    &simulator,
+                    1000,
+                    1000,
                 );
             }
             ModeSelectorState::ModeSelectorNav2 => {
@@ -146,7 +154,9 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
-                    &conn,
+                    &simulator,
+                    1000,
+                    1000,
                 );
             }
             ModeSelectorState::ModeSelectorAdf => {
@@ -156,7 +166,9 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
-                    &conn,
+                    &simulator,
+                    1000,
+                    1000,
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
@@ -232,7 +244,9 @@ fn frequency_logic(
     window_active: Window,
     window_standby: Window,
     radio_panel: &mut RadioPanel,
-    conn: &SimConnector
+    simulator: &SimConnector,
+    active_event_id: u32,
+    standby_event_id: u32,
 ) {
     if matches!(input.button_upper, ButtonState::Pressed) {
         swap_frequencies(frequency_state);
@@ -273,8 +287,8 @@ fn frequency_logic(
     let standby_fract = format!("{:0>3}", standby_fract);
     let standby_frequency = format!("{}{}000", standby_whole, standby_fract);
     let standby_frequency = parse::<u32>(&standby_frequency).unwrap();
-    conn.transmit_client_event(1, 1000, active_frequency, 5, 0);
-    conn.transmit_client_event(1, 1001, standby_frequency, 5, 0);
+    simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0);
+    simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0);
 
     // Format for hardware
     let active_whole = active_whole.to_string()[1..].to_string(); // truncate first digit because display can only display 5
