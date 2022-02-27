@@ -107,6 +107,7 @@ fn main() {
     simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
     simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
     simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1004, "XPNDR_SET");
 
     loop {
         let input = radio_panel.wait_for_input();
@@ -181,6 +182,7 @@ fn main() {
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
+                    &simulator,
                 );
             }
         }
@@ -193,6 +195,7 @@ fn xpdr_logic(
     window_active: Window,
     window_standby: Window,
     radio_panel: &mut RadioPanel,
+    simulator: &SimConnector,
 ) {
     if matches!(input.button_upper, ButtonState::Pressed) {
         xpdr_state.selected_digit += 1;
@@ -211,21 +214,26 @@ fn xpdr_logic(
         RotaryState::None => 0,
     };
     xpdr_state.code[xpdr_state.selected_digit] =
-        wrap(xpdr_state.code[xpdr_state.selected_digit], 0, 10);
+        wrap(xpdr_state.code[xpdr_state.selected_digit], 0, 8);
+
 
     let code = xpdr_state.code.map(|d| d.to_string()).join("");
+    let hex = format!("0x{}", code);
+    let hex = parse::<u32>(&hex).unwrap();
     let code = format!(" {}", code);
     let code: String = code
         .chars()
         .enumerate()
-        .map(|(i, c)| {
+        .map(|(i, char)| {
             if i == (xpdr_state.selected_digit + 1) {
-                format!("{}.", c)
+                format!("{}.", char)    // if digit selected, add dot to it
             } else {
-                c.to_string()
+                char.to_string()
             }
         })
         .collect();
+
+    simulator.transmit_client_event(1, 1004, hex, 5, 0);
 
     radio_panel.set_window(window_active as usize, "     ");
     radio_panel.set_window(window_standby as usize, &code);
