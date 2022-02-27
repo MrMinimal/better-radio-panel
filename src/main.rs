@@ -102,7 +102,7 @@ fn main() {
         },
     };
 
-    conn.map_client_event_to_sim_event(1000, "COM_STBY_RADIO_SET");
+    conn.map_client_event_to_sim_event(1000, "COM_STBY_RADIO_SET_HZ");
     conn.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SWAP");
 
     loop {
@@ -272,7 +272,9 @@ fn frequency_logic(
     let standby_fract = format!("{:0>2}", standby_fract);
     let standby_frequency = format!("0x{}{}", standby_whole, standby_fract);
     let f = parse::<u32>(&standby_frequency).unwrap();
-    conn.transmit_client_event(1, 1000, f, 5, 0);
+    //conn.transmit_client_event(1, 1000, f, 5, 0);
+    conn.transmit_client_event(1, 1000, 120895000, 5, 0);
+
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState, conn: &SimConnector) {
