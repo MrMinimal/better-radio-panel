@@ -12,7 +12,7 @@ const PRODUCT_ID: u16 = 0x0d05; // Radio Panel
 
 const CONTROL_MESSAGE_SIZE: usize = 23; // 2 bytes at end unused, required on Windows hidapi
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct InputState {
     pub mode_selector_upper: ModeSelectorState,
     pub mode_selector_lower: ModeSelectorState,

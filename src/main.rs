@@ -1,11 +1,10 @@
+use std::mem::transmute_copy;
 use std::thread::sleep;
 use std::time::Duration;
-use std::mem::transmute_copy;
 
-
-use std::convert::TryInto;
 use parse_int::parse;
 use simconnect::{self, SimConnector};
+use std::convert::TryInto;
 
 use radio_panel::{
     device::{InputState, RadioPanel},
@@ -49,9 +48,9 @@ struct ModeStates {
 }
 
 struct DataStruct {
-  lat: f64,
-  lon: f64,
-  alt: f64,
+    lat: f64,
+    lon: f64,
+    alt: f64,
 }
 
 fn main() {
@@ -61,7 +60,7 @@ fn main() {
     let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
 
-    let mut mode_states_upper = ModeStates {
+    let mut mode_states = ModeStates {
         com1_state: FrequencyState {
             standby_whole_part: 118,
             standby_fractional_part: 0,
@@ -107,69 +106,84 @@ fn main() {
     simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
     simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
     simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1004, "XPNDR_SET");
+    simulator.map_client_event_to_sim_event(1004, "NAV1_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1005, "NAV1_STBY_SET_HZ");
+    simulator.map_client_event_to_sim_event(1006, "NAV2_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(1007, "NAV2_STBY_SET_HZ");
+    simulator.map_client_event_to_sim_event(1008, "XPNDR_SET");
 
     loop {
         let input = radio_panel.wait_for_input();
+
         match input.mode_selector_upper {
             ModeSelectorState::ModeSelectorCom1 => {
                 frequency_logic(
-                    input,
-                    &mut mode_states_upper.com1_state,
+                    &mut mode_states.com1_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
                     1001,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorCom2 => {
                 frequency_logic(
-                    input,
-                    &mut mode_states_upper.com2_state,
+                    &mut mode_states.com2_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1002,
                     1003,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorNav1 => {
                 frequency_logic(
-                    input,
-                    &mut mode_states_upper.nav1_state,
+                    &mut mode_states.nav1_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
                     1000,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorNav2 => {
                 frequency_logic(
-                    input,
-                    &mut mode_states_upper.nav2_state,
+                    &mut mode_states.nav2_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
                     1000,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorAdf => {
                 frequency_logic(
-                    input,
-                    &mut mode_states_upper.adf_state,
+                    &mut mode_states.adf_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
                     1000,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
@@ -178,9 +192,95 @@ fn main() {
             ModeSelectorState::ModeSelectorXpdr => {
                 xpdr_logic(
                     input,
-                    &mut mode_states_upper.xpdr_state,
+                    &mut mode_states.xpdr_state,
                     Window::TopLeft,
                     Window::TopRight,
+                    &mut radio_panel,
+                    &simulator,
+                );
+            }
+        }
+
+        match input.mode_selector_lower {
+            ModeSelectorState::ModeSelectorCom1 => {
+                frequency_logic(
+                    &mut mode_states.com1_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
+                    &mut radio_panel,
+                    &simulator,
+                    1000,
+                    1001,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+            }
+            ModeSelectorState::ModeSelectorCom2 => {
+                frequency_logic(
+                    &mut mode_states.com2_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
+                    &mut radio_panel,
+                    &simulator,
+                    1002,
+                    1003,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav1 => {
+                frequency_logic(
+                    &mut mode_states.nav1_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
+                    &mut radio_panel,
+                    &simulator,
+                    1004,
+                    1005,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav2 => {
+                frequency_logic(
+                    &mut mode_states.nav2_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
+                    &mut radio_panel,
+                    &simulator,
+                    1006,
+                    1007,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+            }
+            ModeSelectorState::ModeSelectorAdf => {
+                frequency_logic(
+                    &mut mode_states.adf_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
+                    &mut radio_panel,
+                    &simulator,
+                    1000,
+                    1000,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+            }
+            ModeSelectorState::ModeSelectorDme => {
+                dme_logic(&mut radio_panel, Window::BottomLeft, Window::BottomRight);
+            }
+            ModeSelectorState::ModeSelectorXpdr => {
+                xpdr_logic(
+                    input,
+                    &mut mode_states.xpdr_state,
+                    Window::BottomLeft,
+                    Window::BottomRight,
                     &mut radio_panel,
                     &simulator,
                 );
@@ -216,7 +316,6 @@ fn xpdr_logic(
     xpdr_state.code[xpdr_state.selected_digit] =
         wrap(xpdr_state.code[xpdr_state.selected_digit], 0, 8);
 
-
     let code = xpdr_state.code.map(|d| d.to_string()).join("");
     let hex = format!("0x{}", code);
     let hex = parse::<u32>(&hex).unwrap();
@@ -226,7 +325,7 @@ fn xpdr_logic(
         .enumerate()
         .map(|(i, char)| {
             if i == (xpdr_state.selected_digit + 1) {
-                format!("{}.", char)    // if digit selected, add dot to it
+                format!("{}.", char) // if digit selected, add dot to it
             } else {
                 char.to_string()
             }
@@ -247,7 +346,6 @@ fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby
 }
 
 fn frequency_logic(
-    input: InputState,
     frequency_state: &mut FrequencyState,
     window_active: Window,
     window_standby: Window,
@@ -255,8 +353,11 @@ fn frequency_logic(
     simulator: &SimConnector,
     active_event_id: u32,
     standby_event_id: u32,
+    swap_button: ButtonState,
+    outer_rotary: RotaryState,
+    inner_rotary: RotaryState,
 ) {
-    if matches!(input.button_upper, ButtonState::Pressed) {
+    if matches!(swap_button, ButtonState::Pressed) {
         swap_frequencies(frequency_state);
     }
 
@@ -266,12 +367,12 @@ fn frequency_logic(
     let mut standby_whole = frequency_state.standby_whole_part;
     let mut standby_fract = frequency_state.standby_fractional_part;
 
-    standby_whole += match input.rotary_upper_outer {
+    standby_whole += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    standby_fract += match input.rotary_upper_inner {
+    standby_fract += match inner_rotary {
         RotaryState::Clockwise => 5,
         RotaryState::CounterClockwise => -5,
         RotaryState::None => 0,

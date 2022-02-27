@@ -1,17 +1,17 @@
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum ButtonState {
     Pressed,
     Released,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum RotaryState {
     None,
     Clockwise,
     CounterClockwise,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum ModeSelectorState {
     ModeSelectorCom1,
     ModeSelectorCom2,
