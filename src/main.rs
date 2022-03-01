@@ -385,32 +385,19 @@ fn handle_inputs(
         swap_frequencies(frequency_state);
     }
 
-    // More consise variable names
-    let active_whole = frequency_state.active_whole_part;
-    let active_fract = frequency_state.active_fractional_part;
-    let mut standby_whole = frequency_state.standby_whole_part;
-    let mut standby_fract = frequency_state.standby_fractional_part;
-
-    standby_whole += match outer_rotary {
+    frequency_state.standby_whole_part += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    standby_fract += match inner_rotary {
+    frequency_state.standby_fractional_part += match inner_rotary {
         RotaryState::Clockwise => 5,
         RotaryState::CounterClockwise => -5,
         RotaryState::None => 0,
     };
 
-    standby_whole = wrap(standby_whole, 118, 137);
-    standby_fract = wrap(standby_fract, 0, 1000);
-
-    // Save values for next iteration
-    frequency_state.active_whole_part = active_whole;
-    frequency_state.active_fractional_part = active_fract;
-    frequency_state.standby_whole_part = standby_whole;
-    frequency_state.standby_fractional_part = standby_fract;
-
+    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
+    frequency_state.standby_fractional_part = wrap(frequency_state.standby_fractional_part, 0, 1000);
 }
 
 fn display_values(
