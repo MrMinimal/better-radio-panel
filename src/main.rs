@@ -1,4 +1,4 @@
-use std::mem::transmute_copy;
+use std::{mem::transmute_copy, fmt::Display};
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -117,7 +117,13 @@ fn main() {
 
         match input.mode_selector_upper {
             ModeSelectorState::ModeSelectorCom1 => {
-                frequency_logic(
+                handle_inputs(
+                    &mut mode_states.com1_state,
+                    input.button_upper,
+                    input.rotary_upper_outer,
+                    input.rotary_upper_inner,
+                );
+                display_values(
                     &mut mode_states.com1_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -125,13 +131,16 @@ fn main() {
                     &simulator,
                     1000,
                     1001,
+                );
+            }
+            ModeSelectorState::ModeSelectorCom2 => {
+                handle_inputs(
+                    &mut mode_states.com2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorCom2 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.com2_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -139,13 +148,16 @@ fn main() {
                     &simulator,
                     1002,
                     1003,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav1 => {
+                handle_inputs(
+                    &mut mode_states.nav1_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorNav1 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.nav1_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -153,13 +165,16 @@ fn main() {
                     &simulator,
                     1000,
                     1000,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav2 => {
+                handle_inputs(
+                    &mut mode_states.nav2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorNav2 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.nav2_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -167,13 +182,16 @@ fn main() {
                     &simulator,
                     1000,
                     1000,
+                );
+            }
+            ModeSelectorState::ModeSelectorAdf => {
+                handle_inputs(
+                    &mut mode_states.adf_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorAdf => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.adf_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -181,9 +199,6 @@ fn main() {
                     &simulator,
                     1000,
                     1000,
-                    input.button_upper,
-                    input.rotary_upper_outer,
-                    input.rotary_upper_inner,
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
@@ -203,7 +218,13 @@ fn main() {
 
         match input.mode_selector_lower {
             ModeSelectorState::ModeSelectorCom1 => {
-                frequency_logic(
+                handle_inputs(
+                    &mut mode_states.com1_state,
+                    input.button_lower,
+                    input.rotary_lower_outer,
+                    input.rotary_lower_inner,
+                );
+                display_values(
                     &mut mode_states.com1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -211,13 +232,16 @@ fn main() {
                     &simulator,
                     1000,
                     1001,
+                );
+            }
+            ModeSelectorState::ModeSelectorCom2 => {
+                handle_inputs(
+                    &mut mode_states.com2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorCom2 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.com2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -225,13 +249,16 @@ fn main() {
                     &simulator,
                     1002,
                     1003,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav1 => {
+                handle_inputs(
+                    &mut mode_states.nav1_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorNav1 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.nav1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -239,13 +266,16 @@ fn main() {
                     &simulator,
                     1004,
                     1005,
+                );
+            }
+            ModeSelectorState::ModeSelectorNav2 => {
+                handle_inputs(
+                    &mut mode_states.nav2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorNav2 => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.nav2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -253,13 +283,16 @@ fn main() {
                     &simulator,
                     1006,
                     1007,
+                );
+            }
+            ModeSelectorState::ModeSelectorAdf => {
+                handle_inputs(
+                    &mut mode_states.adf_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-            }
-            ModeSelectorState::ModeSelectorAdf => {
-                frequency_logic(
+                display_values(
                     &mut mode_states.adf_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -267,9 +300,6 @@ fn main() {
                     &simulator,
                     1000,
                     1000,
-                    input.button_lower,
-                    input.rotary_lower_outer,
-                    input.rotary_lower_inner,
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
@@ -345,14 +375,8 @@ fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby
     radio_panel.update_all_displays();
 }
 
-fn frequency_logic(
+fn handle_inputs(
     frequency_state: &mut FrequencyState,
-    window_active: Window,
-    window_standby: Window,
-    radio_panel: &mut RadioPanel,
-    simulator: &SimConnector,
-    active_event_id: u32,
-    standby_event_id: u32,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
     inner_rotary: RotaryState,
@@ -386,6 +410,23 @@ fn frequency_logic(
     frequency_state.active_fractional_part = active_fract;
     frequency_state.standby_whole_part = standby_whole;
     frequency_state.standby_fractional_part = standby_fract;
+
+}
+
+fn display_values(
+    frequency_state: &mut FrequencyState,
+    window_active: Window,
+    window_standby: Window,
+    radio_panel: &mut RadioPanel,
+    simulator: &SimConnector,
+    active_event_id: u32,
+    standby_event_id: u32,
+) {
+    // More consise variable names
+    let active_whole = frequency_state.active_whole_part;
+    let active_fract = frequency_state.active_fractional_part;
+    let mut standby_whole = frequency_state.standby_whole_part;
+    let mut standby_fract = frequency_state.standby_fractional_part;
 
     // Format for FS2020
     let active_whole = format!("{:0>3}", active_whole);
