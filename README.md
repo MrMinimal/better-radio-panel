@@ -36,6 +36,7 @@ Not yet but I am open to Pull Requests.
 
  - [Reverse engineering](https://github.com/bjanders/fpanels)
  - [Based on](https://github.com/daibach142/SaitekRadio)
+ - [Icons](flaticon.com/)
 
 
 ## License
