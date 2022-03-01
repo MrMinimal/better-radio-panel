@@ -332,7 +332,7 @@ fn xpdr_logic(
         })
         .collect();
 
-    simulator.transmit_client_event(1, 1004, hex, 5, 0);
+    simulator.transmit_client_event(1, 1008, hex, 5, 0);
 
     radio_panel.set_window(window_active as usize, "     ");
     radio_panel.set_window(window_standby as usize, &code);
