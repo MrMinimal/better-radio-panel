@@ -1,0 +1,16 @@
+.shared_windows_runners:
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+
+stages:
+  - build
+
+build:
+  extends:
+  - .shared_windows_runners
+  stage: build
+  image: rust:latest
+  script:
+    - cargo build --verbose --release
