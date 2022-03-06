@@ -1,10 +1,6 @@
-use std::{mem::transmute_copy, fmt::Display};
-use std::thread::sleep;
-use std::time::Duration;
-
 use parse_int::parse;
 use simconnect::{self, SimConnector};
-use std::convert::TryInto;
+use std::{convert::TryInto, fmt::Result, thread, time::Duration};
 
 use radio_panel::{
     device::{InputState, RadioPanel},
@@ -54,9 +50,6 @@ struct DataStruct {
 }
 
 fn main() {
-    let mut simulator = simconnect::SimConnector::new();
-    simulator.connect("Simple Program"); // Intialize connection with SimConnect
-
     let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
 
@@ -101,19 +94,32 @@ fn main() {
         },
     };
 
-    // Tell simulator which event ID is supposed to represent what simulator event
-    simulator.map_client_event_to_sim_event(1000, "COM_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1004, "NAV1_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1005, "NAV1_STBY_SET_HZ");
-    simulator.map_client_event_to_sim_event(1006, "NAV2_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1007, "NAV2_STBY_SET_HZ");
-    simulator.map_client_event_to_sim_event(1008, "XPNDR_SET");
+
+    let mut simulator = simconnect::SimConnector::new();
+    let mut connected_to_sim = false;
 
     loop {
-        let input = radio_panel.wait_for_input();
+        while !connected_to_sim {
+            simulator = simconnect::SimConnector::new();
+            connected_to_sim = simulator.connect("BetterRadioPanel"); // Intialize connection with SimConnect
+
+            if !connected_to_sim {
+                break;
+            }
+
+            // Tell simulator which event ID is supposed to represent what simulator event
+            simulator.map_client_event_to_sim_event(1000, "COM_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1004, "NAV1_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1005, "NAV1_STBY_SET_HZ");
+            simulator.map_client_event_to_sim_event(1006, "NAV2_RADIO_SET_HZ");
+            simulator.map_client_event_to_sim_event(1007, "NAV2_STBY_SET_HZ");
+            simulator.map_client_event_to_sim_event(1008, "XPNDR_SET");
+        }
+
+        let input = radio_panel.wait_for_input();   // blocking call, wait for any input to happen
 
         match input.mode_selector_upper {
             ModeSelectorState::ModeSelectorCom1 => {
@@ -123,7 +129,7 @@ fn main() {
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.com1_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -140,7 +146,7 @@ fn main() {
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.com2_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -157,7 +163,7 @@ fn main() {
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.nav1_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -174,7 +180,7 @@ fn main() {
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.nav2_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -191,7 +197,7 @@ fn main() {
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.adf_state,
                     Window::TopLeft,
                     Window::TopRight,
@@ -224,7 +230,7 @@ fn main() {
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.com1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -241,7 +247,7 @@ fn main() {
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.com2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -258,7 +264,7 @@ fn main() {
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.nav1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -275,7 +281,7 @@ fn main() {
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.nav2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -292,7 +298,7 @@ fn main() {
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
-                display_values(
+                connected_to_sim = display_values(
                     &mut mode_states.adf_state,
                     Window::BottomLeft,
                     Window::BottomRight,
@@ -408,12 +414,12 @@ fn display_values(
     simulator: &SimConnector,
     active_event_id: u32,
     standby_event_id: u32,
-) {
+)  -> bool {
     // More consise variable names
     let active_whole = frequency_state.active_whole_part;
     let active_fract = frequency_state.active_fractional_part;
-    let mut standby_whole = frequency_state.standby_whole_part;
-    let mut standby_fract = frequency_state.standby_fractional_part;
+    let standby_whole = frequency_state.standby_whole_part;
+    let standby_fract = frequency_state.standby_fractional_part;
 
     // Format for FS2020
     let active_whole = format!("{:0>3}", active_whole);
@@ -424,8 +430,12 @@ fn display_values(
     let standby_fract = format!("{:0>3}", standby_fract);
     let standby_frequency = format!("{}{}000", standby_whole, standby_fract);
     let standby_frequency = parse::<u32>(&standby_frequency).unwrap();
-    simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0);
-    simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0);
+    if !simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0) {
+        return false
+    };
+    if !simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0) {
+        return false
+    }
 
     // Format for hardware
     let active_whole = active_whole.to_string()[1..].to_string(); // truncate first digit because display can only display 5
@@ -435,6 +445,8 @@ fn display_values(
     radio_panel.set_window(window_active as usize, &active_frequency);
     radio_panel.set_window(window_standby as usize, &standby_frequency);
     radio_panel.update_all_displays();
+
+    return true
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
