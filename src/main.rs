@@ -1,6 +1,6 @@
 use parse_int::parse;
 use simconnect::{self, SimConnector};
-use std::{convert::TryInto, fmt::Result, thread, time::Duration};
+use std::{convert::TryInto, fmt::{Result, format}, thread, time::Duration};
 
 use radio_panel::{
     device::{InputState, RadioPanel},
@@ -33,7 +33,14 @@ struct XpdrState {
     selected_digit: usize,
 }
 
-struct ModeStates {
+struct AutopilotState {
+    airspeed: i16,
+    heading: i8,
+    altitude: i16,
+    vertical_speed: i16,
+}
+
+struct PlaneState {
     com1_state: FrequencyState,
     com2_state: FrequencyState,
     nav1_state: FrequencyState,
@@ -41,6 +48,7 @@ struct ModeStates {
     adf_state: FrequencyState,
     dme_state: DmeState,
     xpdr_state: XpdrState,
+    autopilot_state: AutopilotState,
 }
 
 struct DataStruct {
@@ -53,7 +61,7 @@ fn main() {
     let mut radio_panel = RadioPanel::new();
     show_standby_screen(&mut radio_panel);
 
-    let mut mode_states = ModeStates {
+    let mut state = PlaneState {
         com1_state: FrequencyState {
             standby_whole_part: 118,
             standby_fractional_part: 0,
@@ -92,8 +100,13 @@ fn main() {
             code: [0; 4],
             selected_digit: 0,
         },
+        autopilot_state: AutopilotState {
+            airspeed: 0,
+            heading: 0,
+            altitude: 0,
+            vertical_speed: 0,
+        },
     };
-
 
     let mut simulator = simconnect::SimConnector::new();
     let mut connected_to_sim = false;
@@ -117,20 +130,36 @@ fn main() {
             simulator.map_client_event_to_sim_event(1006, "NAV2_RADIO_SET_HZ");
             simulator.map_client_event_to_sim_event(1007, "NAV2_STBY_SET_HZ");
             simulator.map_client_event_to_sim_event(1008, "XPNDR_SET");
+
+            simulator.map_client_event_to_sim_event(1009, "HEADING_BUG_SET");
+            simulator.map_client_event_to_sim_event(1010, "AP_ALT_VAR_SET_ENGLISH");
+            simulator.map_client_event_to_sim_event(1011, "AP_VS_VAR_SET_ENGLISH");
+            simulator.map_client_event_to_sim_event(1012, "AP_SPD_VAR_SET");
         }
 
-        let input = radio_panel.wait_for_input();   // blocking call, wait for any input to happen
+        let input = radio_panel.wait_for_input(); // blocking call, wait for any input to happen
+
+        if matches!(
+            input.mode_selector_upper,
+            ModeSelectorState::ModeSelectorXpdr
+        ) && matches!(
+            input.mode_selector_lower,
+            ModeSelectorState::ModeSelectorXpdr
+        ) {
+            autopilot_logic(&state.autopilot_state, &simulator, &mut radio_panel);
+            continue;
+        }
 
         match input.mode_selector_upper {
             ModeSelectorState::ModeSelectorCom1 => {
                 handle_inputs(
-                    &mut mode_states.com1_state,
+                    &mut state.com1_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.com1_state,
+                    &mut state.com1_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -141,13 +170,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorCom2 => {
                 handle_inputs(
-                    &mut mode_states.com2_state,
+                    &mut state.com2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.com2_state,
+                    &mut state.com2_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -158,13 +187,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorNav1 => {
                 handle_inputs(
-                    &mut mode_states.nav1_state,
+                    &mut state.nav1_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.nav1_state,
+                    &mut state.nav1_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -175,13 +204,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorNav2 => {
                 handle_inputs(
-                    &mut mode_states.nav2_state,
+                    &mut state.nav2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.nav2_state,
+                    &mut state.nav2_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -192,13 +221,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorAdf => {
                 handle_inputs(
-                    &mut mode_states.adf_state,
+                    &mut state.adf_state,
                     input.button_upper,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.adf_state,
+                    &mut state.adf_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -213,7 +242,7 @@ fn main() {
             ModeSelectorState::ModeSelectorXpdr => {
                 xpdr_logic(
                     input,
-                    &mut mode_states.xpdr_state,
+                    &mut state.xpdr_state,
                     Window::TopLeft,
                     Window::TopRight,
                     &mut radio_panel,
@@ -225,13 +254,13 @@ fn main() {
         match input.mode_selector_lower {
             ModeSelectorState::ModeSelectorCom1 => {
                 handle_inputs(
-                    &mut mode_states.com1_state,
+                    &mut state.com1_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.com1_state,
+                    &mut state.com1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -242,13 +271,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorCom2 => {
                 handle_inputs(
-                    &mut mode_states.com2_state,
+                    &mut state.com2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.com2_state,
+                    &mut state.com2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -259,13 +288,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorNav1 => {
                 handle_inputs(
-                    &mut mode_states.nav1_state,
+                    &mut state.nav1_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.nav1_state,
+                    &mut state.nav1_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -276,13 +305,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorNav2 => {
                 handle_inputs(
-                    &mut mode_states.nav2_state,
+                    &mut state.nav2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.nav2_state,
+                    &mut state.nav2_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -293,13 +322,13 @@ fn main() {
             }
             ModeSelectorState::ModeSelectorAdf => {
                 handle_inputs(
-                    &mut mode_states.adf_state,
+                    &mut state.adf_state,
                     input.button_lower,
                     input.rotary_lower_outer,
                     input.rotary_lower_inner,
                 );
                 connected_to_sim = display_values(
-                    &mut mode_states.adf_state,
+                    &mut state.adf_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -314,7 +343,7 @@ fn main() {
             ModeSelectorState::ModeSelectorXpdr => {
                 xpdr_logic(
                     input,
-                    &mut mode_states.xpdr_state,
+                    &mut state.xpdr_state,
                     Window::BottomLeft,
                     Window::BottomRight,
                     &mut radio_panel,
@@ -381,6 +410,22 @@ fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby
     radio_panel.update_all_displays();
 }
 
+fn autopilot_logic(
+    state: &AutopilotState,
+    simulator: &SimConnector,
+    radio_panel: &mut RadioPanel,
+) {
+    simulator.transmit_client_event(1, 1009, state.heading as u32, 5, 0);
+    simulator.transmit_client_event(1, 1010, state.altitude as u32, 5, 0);
+    simulator.transmit_client_event(1, 1011, state.vertical_speed as u32, 5, 0);
+    simulator.transmit_client_event(1, 1012, state.airspeed as u32, 5, 0);
+    radio_panel.set_window(0, &format!("{:>5}", state.airspeed));
+    radio_panel.set_window(1, &format!("  {:0>3}", state.heading));
+    radio_panel.set_window(2, &format!("{:>5}", state.altitude));
+    radio_panel.set_window(3, &format!("{:>5}", state.vertical_speed));
+    radio_panel.update_all_displays();
+}
+
 fn handle_inputs(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
@@ -403,7 +448,8 @@ fn handle_inputs(
     };
 
     frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
-    frequency_state.standby_fractional_part = wrap(frequency_state.standby_fractional_part, 0, 1000);
+    frequency_state.standby_fractional_part =
+        wrap(frequency_state.standby_fractional_part, 0, 1000);
 }
 
 fn display_values(
@@ -414,7 +460,7 @@ fn display_values(
     simulator: &SimConnector,
     active_event_id: u32,
     standby_event_id: u32,
-)  -> bool {
+) -> bool {
     // More consise variable names
     let active_whole = frequency_state.active_whole_part;
     let active_fract = frequency_state.active_fractional_part;
@@ -431,10 +477,10 @@ fn display_values(
     let standby_frequency = format!("{}{}000", standby_whole, standby_fract);
     let standby_frequency = parse::<u32>(&standby_frequency).unwrap();
     if !simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0) {
-        return false
+        return false;
     };
     if !simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0) {
-        return false
+        return false;
     }
 
     // Format for hardware
@@ -446,7 +492,7 @@ fn display_values(
     radio_panel.set_window(window_standby as usize, &standby_frequency);
     radio_panel.update_all_displays();
 
-    return true
+    return true;
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
