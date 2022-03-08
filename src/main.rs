@@ -1,6 +1,11 @@
 use parse_int::parse;
 use simconnect::{self, SimConnector};
-use std::{convert::TryInto, fmt::{Result, format}, thread, time::Duration};
+use std::{
+    convert::TryInto,
+    fmt::{format, Result},
+    thread,
+    time::Duration,
+};
 
 use radio_panel::{
     device::{InputState, RadioPanel},
@@ -35,9 +40,15 @@ struct XpdrState {
 
 struct AutopilotState {
     airspeed: i16,
-    heading: i8,
-    altitude: i16,
+    heading: i16,
+    altitude: i32,
     vertical_speed: i16,
+    selected_setting: AutopilotValue,
+}
+
+enum AutopilotValue {
+    Altitude,
+    VerticalSpeed,
 }
 
 struct PlaneState {
@@ -103,8 +114,9 @@ fn main() {
         autopilot_state: AutopilotState {
             airspeed: 0,
             heading: 0,
-            altitude: 0,
+            altitude: 100,  // Airbus A320's minimum setting is 100, might as well initiate as such
             vertical_speed: 0,
+            selected_setting: AutopilotValue::Altitude,
         },
     };
 
@@ -139,20 +151,22 @@ fn main() {
 
         let input = radio_panel.wait_for_input(); // blocking call, wait for any input to happen
 
-        if matches!(
-            input.mode_selector_upper,
-            ModeSelectorState::ModeSelectorXpdr
-        ) && matches!(
-            input.mode_selector_lower,
-            ModeSelectorState::ModeSelectorXpdr
-        ) {
+        if input.mode_selector_upper == input.mode_selector_lower {
+            handle_autopilot_input(
+                &mut state.autopilot_state,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+                input.button_lower,
+            );
             autopilot_logic(&state.autopilot_state, &simulator, &mut radio_panel);
             continue;
         }
 
         match input.mode_selector_upper {
             ModeSelectorState::ModeSelectorCom1 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.com1_state,
                     input.button_upper,
                     input.rotary_upper_outer,
@@ -169,7 +183,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorCom2 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.com2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
@@ -186,7 +200,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorNav1 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.nav1_state,
                     input.button_upper,
                     input.rotary_upper_outer,
@@ -203,7 +217,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorNav2 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.nav2_state,
                     input.button_upper,
                     input.rotary_upper_outer,
@@ -220,7 +234,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorAdf => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.adf_state,
                     input.button_upper,
                     input.rotary_upper_outer,
@@ -253,7 +267,7 @@ fn main() {
 
         match input.mode_selector_lower {
             ModeSelectorState::ModeSelectorCom1 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.com1_state,
                     input.button_lower,
                     input.rotary_lower_outer,
@@ -270,7 +284,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorCom2 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.com2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
@@ -287,7 +301,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorNav1 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.nav1_state,
                     input.button_lower,
                     input.rotary_lower_outer,
@@ -304,7 +318,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorNav2 => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.nav2_state,
                     input.button_lower,
                     input.rotary_lower_outer,
@@ -321,7 +335,7 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorAdf => {
-                handle_inputs(
+                handle_frequency_input(
                     &mut state.adf_state,
                     input.button_lower,
                     input.rotary_lower_outer,
@@ -410,23 +424,36 @@ fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby
     radio_panel.update_all_displays();
 }
 
-fn autopilot_logic(
-    state: &AutopilotState,
-    simulator: &SimConnector,
-    radio_panel: &mut RadioPanel,
-) {
+fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel: &mut RadioPanel) {
     simulator.transmit_client_event(1, 1009, state.heading as u32, 5, 0);
     simulator.transmit_client_event(1, 1010, state.altitude as u32, 5, 0);
     simulator.transmit_client_event(1, 1011, state.vertical_speed as u32, 5, 0);
     simulator.transmit_client_event(1, 1012, state.airspeed as u32, 5, 0);
     radio_panel.set_window(0, &format!("{:>5}", state.airspeed));
     radio_panel.set_window(1, &format!("  {:0>3}", state.heading));
-    radio_panel.set_window(2, &format!("{:>5}", state.altitude));
-    radio_panel.set_window(3, &format!("{:>5}", state.vertical_speed));
+
+    let selected_indicator_altitude = match state.selected_setting {
+        AutopilotValue::Altitude => ".",
+        AutopilotValue::VerticalSpeed => "",
+    };
+
+    let selected_indicator_vertical_speed = match state.selected_setting {
+        AutopilotValue::Altitude => "",
+        AutopilotValue::VerticalSpeed => ".",
+    };
+
+    radio_panel.set_window(2, &format!("{:0>5}{}", state.altitude, selected_indicator_altitude));
+
+    // make sure formatting is the same as in an Airbus (align right, always display 4 digits, sign in front)
+    match state.vertical_speed {
+        s if s >= 0 => radio_panel.set_window(3, &format!(" {:0>4}{}", state.vertical_speed, selected_indicator_vertical_speed)),
+        s if s < 0 => radio_panel.set_window(3, &format!("{:05}{}", state.vertical_speed, selected_indicator_vertical_speed)),
+        _ => (),
+    }
     radio_panel.update_all_displays();
 }
 
-fn handle_inputs(
+fn handle_frequency_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
@@ -450,6 +477,68 @@ fn handle_inputs(
     frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
     frequency_state.standby_fractional_part =
         wrap(frequency_state.standby_fractional_part, 0, 1000);
+}
+
+fn handle_autopilot_input(
+    autopilot_state: &mut AutopilotState,
+    outer_rotary_upper: RotaryState,
+    inner_rotary_upper: RotaryState,
+    outer_rotary_lower: RotaryState,
+    inner_rotary_lower: RotaryState,
+    select_button: ButtonState,
+) {
+    if matches!(select_button, ButtonState::Pressed) {
+        autopilot_state.selected_setting = match autopilot_state.selected_setting {
+            AutopilotValue::Altitude => AutopilotValue::VerticalSpeed,
+            AutopilotValue::VerticalSpeed => AutopilotValue::Altitude,
+        }
+    }
+
+    autopilot_state.heading += match outer_rotary_upper {
+        RotaryState::Clockwise => 1,
+        RotaryState::CounterClockwise => -1,
+        RotaryState::None => 0,
+    };
+    autopilot_state.heading = wrap(autopilot_state.heading, 0, 360);
+
+    autopilot_state.airspeed += match inner_rotary_upper {
+        RotaryState::Clockwise => 1,
+        RotaryState::CounterClockwise => -1,
+        RotaryState::None => 0,
+    };
+    autopilot_state.airspeed = autopilot_state.airspeed.clamp(0, 9999);
+
+    match autopilot_state.selected_setting {
+        AutopilotValue::Altitude => {
+            autopilot_state.altitude += match outer_rotary_lower {
+                RotaryState::Clockwise => 1000,
+                RotaryState::CounterClockwise => -1000,
+                RotaryState::None => 0,
+            };
+
+            autopilot_state.altitude += match inner_rotary_lower {
+                RotaryState::Clockwise => 100,
+                RotaryState::CounterClockwise => -100,
+                RotaryState::None => 0,
+            };
+            autopilot_state.altitude = autopilot_state.altitude.clamp(100, 100000);
+        }
+        AutopilotValue::VerticalSpeed => {
+            // altitude
+            autopilot_state.vertical_speed += match outer_rotary_lower {
+                RotaryState::Clockwise => 100,
+                RotaryState::CounterClockwise => -100,
+                RotaryState::None => 0,
+            };
+
+            autopilot_state.vertical_speed += match inner_rotary_lower {
+                RotaryState::Clockwise => 100,
+                RotaryState::CounterClockwise => -100,
+                RotaryState::None => 0,
+            };
+            autopilot_state.vertical_speed = autopilot_state.vertical_speed.clamp(-9900, 9900);
+        }
+    }
 }
 
 fn display_values(

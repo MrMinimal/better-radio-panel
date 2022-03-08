@@ -12,6 +12,7 @@ pub enum RotaryState {
 }
 
 #[derive(Copy, Clone, Debug)]
+#[derive(PartialEq, Eq)]
 pub enum ModeSelectorState {
     ModeSelectorCom1,
     ModeSelectorCom2,
