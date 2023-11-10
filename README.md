@@ -16,22 +16,6 @@ Inspired by SPAD.neXt.
 * **lightweight** - no performance / FPS impact
 * **friendly** - improved transponder code usability
 
-## Examples
-
-![Video](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-
-## Installation
-
-TODO
-
-## FAQ
-
-#### Does this work with XPlane, FSX, FlightGear?
-
-Not yet but I am open to Pull Requests.
-
-
 ## Acknowledgements
 
  - [Reverse engineering](https://github.com/bjanders/fpanels)
@@ -42,4 +26,3 @@ Not yet but I am open to Pull Requests.
 ## License
 
 [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html)
-
