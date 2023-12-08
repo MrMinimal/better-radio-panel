@@ -14,7 +14,7 @@ use radio_panel::{
 
 mod radio_panel;
 
-enum Window {
+enum Display {
     TopLeft,
     TopRight,
     BottomLeft,
@@ -174,8 +174,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.com1_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -191,8 +191,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.com2_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1002,
@@ -208,8 +208,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.nav1_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -225,8 +225,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.nav2_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -242,8 +242,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.adf_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -251,14 +251,14 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
-                dme_logic(&mut radio_panel, Window::TopLeft, Window::TopRight);
+                dme_logic(&mut radio_panel, Display::TopLeft, Display::TopRight);
             }
             ModeSelectorState::ModeSelectorXpdr => {
                 xpdr_logic(
                     input,
                     &mut state.xpdr_state,
-                    Window::TopLeft,
-                    Window::TopRight,
+                    Display::TopLeft,
+                    Display::TopRight,
                     &mut radio_panel,
                     &simulator,
                 );
@@ -275,8 +275,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.com1_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -292,8 +292,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.com2_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                     1002,
@@ -309,8 +309,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.nav1_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                     1004,
@@ -326,8 +326,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.nav2_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                     1006,
@@ -343,8 +343,8 @@ fn main() {
                 );
                 connected_to_sim = display_values(
                     &mut state.adf_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                     1000,
@@ -352,14 +352,14 @@ fn main() {
                 );
             }
             ModeSelectorState::ModeSelectorDme => {
-                dme_logic(&mut radio_panel, Window::BottomLeft, Window::BottomRight);
+                dme_logic(&mut radio_panel, Display::BottomLeft, Display::BottomRight);
             }
             ModeSelectorState::ModeSelectorXpdr => {
                 xpdr_logic(
                     input,
                     &mut state.xpdr_state,
-                    Window::BottomLeft,
-                    Window::BottomRight,
+                    Display::BottomLeft,
+                    Display::BottomRight,
                     &mut radio_panel,
                     &simulator,
                 );
@@ -371,8 +371,8 @@ fn main() {
 fn xpdr_logic(
     input: InputState,
     xpdr_state: &mut XpdrState,
-    window_active: Window,
-    window_standby: Window,
+    window_active: Display,
+    window_standby: Display,
     radio_panel: &mut RadioPanel,
     simulator: &SimConnector,
 ) {
@@ -418,7 +418,7 @@ fn xpdr_logic(
     radio_panel.update_all_displays();
 }
 
-fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby: Window) {
+fn dme_logic(radio_panel: &mut RadioPanel, window_active: Display, window_standby: Display) {
     radio_panel.set_window(window_active as usize, "   0.0");
     radio_panel.set_window(window_standby as usize, "    0");
     radio_panel.update_all_displays();
@@ -543,8 +543,8 @@ fn handle_autopilot_input(
 
 fn display_values(
     frequency_state: &mut FrequencyState,
-    window_active: Window,
-    window_standby: Window,
+    window_active: Display,
+    window_standby: Display,
     radio_panel: &mut RadioPanel,
     simulator: &SimConnector,
     active_event_id: u32,
