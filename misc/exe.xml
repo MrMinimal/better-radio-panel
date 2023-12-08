@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<SimBase.Document Type="SimConnect" version="1,0">
+  <Descr>Auto launch external applications on MSFS start</Descr>
+  <Filename>exe.xml</Filename>
+  <Disabled>False</Disabled>
+  <Launch.Addon>
+     <Name>AFCBridge</Name>
+     <Disabled>False</Disabled>
+     <Path>C:\Users\Tom\AppData\Roaming\Microsoft Flight Simulator\Packages\community\AFC_Bridge\bin\AFC_Bridge.exe</Path>
+  </Launch.Addon>
+  <Launch.Addon>
+     <Name>BetterRadioPanel</Name>
+     <Disabled>False</Disabled>
+     <Path>C:\Users\Tom\Dev\better-radio-panel\target\debug\better-radio-panel.exe</Path>
+  </Launch.Addon>
+</SimBase.Document>
