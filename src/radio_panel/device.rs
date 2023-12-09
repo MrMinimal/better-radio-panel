@@ -12,6 +12,8 @@ const PRODUCT_ID: u16 = 0x0d05; // Radio Panel
 
 const CONTROL_MESSAGE_SIZE: usize = 23; // 2 bytes at end unused, required on Windows hidapi
 
+const NO_INPUTS_AFTER_TIMEOUT: u32 = 0;
+
 #[derive(Copy, Clone, Debug)]
 pub struct InputState {
     pub mode_selector_upper: ModeSelectorState,
@@ -22,6 +24,21 @@ pub struct InputState {
     pub rotary_lower_outer: RotaryState,
     pub button_upper: ButtonState,
     pub button_lower: ButtonState,
+}
+
+impl InputState {
+    pub fn new() -> InputState {
+        InputState {
+            mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
+            mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
+            rotary_upper_inner: RotaryState::None,
+            rotary_upper_outer: RotaryState::None,
+            rotary_lower_inner: RotaryState::None,
+            rotary_lower_outer: RotaryState::None,
+            button_upper: ButtonState::Released,
+            button_lower: ButtonState::Released,
+        }
+    }
 }
 
 /// Represents the radio panel with its 4 windows, containing 5 7-segment displays each.
@@ -51,77 +68,84 @@ impl RadioPanel {
 
     /// Blocking call to wait for input from buttons or rotaries
     /// Returns the current state of all buttons and potis on the hardware
-    pub fn wait_for_input(&mut self) -> InputState {
+    pub fn wait_for_input(&mut self) -> Option<InputState> {
         let mut input_buffer = [0u8; 3];
         self.hid_device
-            .read(&mut input_buffer)
+            .read_timeout(&mut input_buffer, 300)
             .expect("Error reading from device");
 
         // Turn buffer array into a single 32 bit value
         let input_buffer = ((input_buffer[0] as u32) << 16)
             | ((input_buffer[1] as u32) << 8)
             | (input_buffer[2] as u32);
-        // println!("{:#034b}", buffer);
+        // println!("{:#034b}", buffer)
 
-        let mut input_state = InputState {
-            mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
-            mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
-            rotary_upper_inner: RotaryState::None,
-            rotary_upper_outer: RotaryState::None,
-            rotary_lower_inner: RotaryState::None,
-            rotary_lower_outer: RotaryState::None,
-            button_upper: ButtonState::Released,
-            button_lower: ButtonState::Released,
-        };
+        match input_buffer {
+            NO_INPUTS_AFTER_TIMEOUT => return None,
+            _ => {
+                let mut input_state = InputState {
+                    mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
+                    mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
+                    rotary_upper_inner: RotaryState::None,
+                    rotary_upper_outer: RotaryState::None,
+                    rotary_lower_inner: RotaryState::None,
+                    rotary_lower_outer: RotaryState::None,
+                    button_upper: ButtonState::Released,
+                    button_lower: ButtonState::Released,
+                };
 
-        input_state.button_upper = parse_button_state(input_buffer, BITMASK_BUTTON_UPPER_PRESSED);
-        input_state.button_lower = parse_button_state(input_buffer, BITMASK_BUTTON_LOWER_PRESSED);
+                input_state.button_upper =
+                    parse_button_state(input_buffer, BITMASK_BUTTON_UPPER_PRESSED);
+                input_state.button_lower =
+                    parse_button_state(input_buffer, BITMASK_BUTTON_LOWER_PRESSED);
 
-        input_state.rotary_upper_inner = parse_rotary_state(
-            input_buffer,
-            BITMASK_ROTARY_UPPER_INNER_CLOCKWISE,
-            BITMASK_ROTARY_UPPER_INNER_COUNTERCLOCKWISE,
-        );
+                input_state.rotary_upper_inner = parse_rotary_state(
+                    input_buffer,
+                    BITMASK_ROTARY_UPPER_INNER_CLOCKWISE,
+                    BITMASK_ROTARY_UPPER_INNER_COUNTERCLOCKWISE,
+                );
 
-        input_state.rotary_upper_outer = parse_rotary_state(
-            input_buffer,
-            BITMASK_ROTARY_UPPER_OUTER_CLOCKWISE,
-            BITMASK_ROTARY_UPPER_OUTER_COUNTERCLOCKWISE,
-        );
+                input_state.rotary_upper_outer = parse_rotary_state(
+                    input_buffer,
+                    BITMASK_ROTARY_UPPER_OUTER_CLOCKWISE,
+                    BITMASK_ROTARY_UPPER_OUTER_COUNTERCLOCKWISE,
+                );
 
-        input_state.rotary_lower_inner = parse_rotary_state(
-            input_buffer,
-            BITMASK_ROTARY_LOWER_INNER_CLOCKWISE,
-            BITMASK_ROTARY_LOWER_INNER_COUNTERCLOCKWISE,
-        );
+                input_state.rotary_lower_inner = parse_rotary_state(
+                    input_buffer,
+                    BITMASK_ROTARY_LOWER_INNER_CLOCKWISE,
+                    BITMASK_ROTARY_LOWER_INNER_COUNTERCLOCKWISE,
+                );
 
-        input_state.rotary_lower_outer = parse_rotary_state(
-            input_buffer,
-            BITMASK_ROTARY_LOWER_OUTER_CLOCKWISE,
-            BITMASK_ROTARY_LOWER_OUTER_COUNTERCLOCKWISE,
-        );
+                input_state.rotary_lower_outer = parse_rotary_state(
+                    input_buffer,
+                    BITMASK_ROTARY_LOWER_OUTER_CLOCKWISE,
+                    BITMASK_ROTARY_LOWER_OUTER_COUNTERCLOCKWISE,
+                );
 
-        input_state.mode_selector_upper = parse_mode_selector_state(
-            input_buffer,
-            BITMASK_MODE_SELECTOR_UPPER_COM1,
-            BITMASK_MODE_SELECTOR_UPPER_COM2,
-            BITMASK_MODE_SELECTOR_UPPER_NAV1,
-            BITMASK_MODE_SELECTOR_UPPER_NAV2,
-            BITMASK_MODE_SELECTOR_UPPER_ADF,
-            BITMASK_MODE_SELECTOR_UPPER_DME,
-        );
+                input_state.mode_selector_upper = parse_mode_selector_state(
+                    input_buffer,
+                    BITMASK_MODE_SELECTOR_UPPER_COM1,
+                    BITMASK_MODE_SELECTOR_UPPER_COM2,
+                    BITMASK_MODE_SELECTOR_UPPER_NAV1,
+                    BITMASK_MODE_SELECTOR_UPPER_NAV2,
+                    BITMASK_MODE_SELECTOR_UPPER_ADF,
+                    BITMASK_MODE_SELECTOR_UPPER_DME,
+                );
 
-        input_state.mode_selector_lower = parse_mode_selector_state(
-            input_buffer,
-            BITMASK_MODE_SELECTOR_LOWER_COM1,
-            BITMASK_MODE_SELECTOR_LOWER_COM2,
-            BITMASK_MODE_SELECTOR_LOWER_NAV1,
-            BITMASK_MODE_SELECTOR_LOWER_NAV2,
-            BITMASK_MODE_SELECTOR_LOWER_ADF,
-            BITMASK_MODE_SELECTOR_LOWER_DME,
-        );
+                input_state.mode_selector_lower = parse_mode_selector_state(
+                    input_buffer,
+                    BITMASK_MODE_SELECTOR_LOWER_COM1,
+                    BITMASK_MODE_SELECTOR_LOWER_COM2,
+                    BITMASK_MODE_SELECTOR_LOWER_NAV1,
+                    BITMASK_MODE_SELECTOR_LOWER_NAV2,
+                    BITMASK_MODE_SELECTOR_LOWER_ADF,
+                    BITMASK_MODE_SELECTOR_LOWER_DME,
+                );
 
-        input_state
+                return Some(input_state);
+            }
+        }
     }
 
     /// Show values in window, previous values are cleared
@@ -158,7 +182,7 @@ impl RadioPanel {
     }
 
     /// Show the data on all displays
-    pub fn update_all_displays(&self) {
+    pub fn update_all_windows(&self) {
         let mut output_buffer = [DIGIT_BLANK; CONTROL_MESSAGE_SIZE];
 
         // Turn stored data into data buffer to send to device
@@ -177,6 +201,13 @@ impl RadioPanel {
         // Send to hardware to display
         output_buffer[0] = 0; // I don't know why this is required
         self.hid_device.send_feature_report(&output_buffer).unwrap();
+    }
+
+    pub fn clear_all_windows(&mut self) {
+        for window_index in 0..4 {
+            self.set_window(window_index, "     ");
+        }
+        self.update_all_windows();
     }
 }
 
