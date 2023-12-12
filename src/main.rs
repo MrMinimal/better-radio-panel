@@ -97,7 +97,7 @@ fn main() {
 
             match input.mode_selector_upper {
                 ModeSelectorState::ModeSelectorCom1 => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.com1_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -114,7 +114,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.com2_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -131,7 +131,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
-                    handle_frequency_input(
+                    handle_nav_frequency_input(
                         &mut state.nav1_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -148,7 +148,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
-                    handle_frequency_input(
+                    handle_nav_frequency_input(
                         &mut state.nav2_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -165,7 +165,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.adf_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -198,7 +198,7 @@ fn main() {
 
             match input.mode_selector_lower {
                 ModeSelectorState::ModeSelectorCom1 => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.com1_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -215,7 +215,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.com2_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -232,7 +232,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
-                    handle_frequency_input(
+                    handle_nav_frequency_input(
                         &mut state.nav1_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -249,7 +249,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
-                    handle_frequency_input(
+                    handle_nav_frequency_input(
                         &mut state.nav2_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -266,7 +266,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
-                    handle_frequency_input(
+                    handle_com_frequency_input(
                         &mut state.adf_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -496,7 +496,33 @@ fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel
     radio_panel.update_all_windows();
 }
 
-fn handle_frequency_input(
+fn handle_com_frequency_input(
+    frequency_state: &mut FrequencyState,
+    swap_button: ButtonState,
+    outer_rotary: RotaryState,
+    inner_rotary: RotaryState,
+) {
+    if matches!(swap_button, ButtonState::Pressed) {
+        swap_frequencies(frequency_state);
+    }
+
+    frequency_state.standby_whole_part += match outer_rotary {
+        RotaryState::Clockwise => 1,
+        RotaryState::CounterClockwise => -1,
+        RotaryState::None => 0,
+    };
+    frequency_state.standby_fractional_part += match inner_rotary {
+        RotaryState::Clockwise => 5,
+        RotaryState::CounterClockwise => -5,
+        RotaryState::None => 0,
+    };
+
+    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
+    frequency_state.standby_fractional_part =
+        wrap(frequency_state.standby_fractional_part, 0, 1000);
+}
+
+fn handle_nav_frequency_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
