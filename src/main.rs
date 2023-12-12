@@ -14,6 +14,7 @@ use radio_panel::{
 
 mod radio_panel;
 
+#[derive(Copy, Clone)]
 enum Window {
     TopLeft,
     TopRight,
@@ -29,8 +30,7 @@ struct FrequencyState {
 }
 
 struct DmeState {
-    miles: f32,
-    knots: i16,
+    distance: f32,
 }
 
 struct XpdrState {
@@ -362,8 +362,7 @@ fn plane_default_state() -> PlaneState {
             active_fractional_part: 0,
         },
         dme_state: DmeState {
-            miles: 0.0,
-            knots: 0,
+            distance: 0.0,
         },
         xpdr_state: XpdrState {
             code: [0; 4],
@@ -383,16 +382,25 @@ fn show_connecting_animation(radio_panel: &mut RadioPanel) {
     radio_panel.clear_all_windows();
 
     for window_index in 0..4 {
+        let window= match window_index {
+            0 => Window::TopLeft,
+            1 => Window::TopRight,
+            2 => Window::BottomLeft,
+            3 => Window::BottomRight,
+            _ => Window::TopLeft,
+        };
+
         for character_index in 0..5 {
             let mut content = String::from("     ");
             content.replace_range(character_index..character_index + 1, "-");
-            radio_panel.set_window(window_index, &content);
+
+            radio_panel.set_window(window, &content);
             radio_panel.update_all_windows();
 
             thread::sleep(time::Duration::from_millis(300));
         }
 
-        radio_panel.set_window(window_index, "     ")
+        radio_panel.set_window(window, "     ")
     }
 }
 
@@ -441,14 +449,14 @@ fn xpdr_logic(
 
     simulator.transmit_client_event(1, 1008, hex, 5, 0);
 
-    radio_panel.set_window(window_active as usize, "     ");
-    radio_panel.set_window(window_standby as usize, &code);
+    radio_panel.set_window(window_active, "     ");
+    radio_panel.set_window(window_standby, &code);
     radio_panel.update_all_windows();
 }
 
 fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby: Window) {
-    radio_panel.set_window(window_active as usize, "   0.0");
-    radio_panel.set_window(window_standby as usize, "    0");
+    radio_panel.set_window(window_active, "   0.0");
+    radio_panel.set_window(window_standby, "    0");
     radio_panel.update_all_windows();
 }
 
@@ -457,8 +465,8 @@ fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel
     simulator.transmit_client_event(1, 1010, state.altitude as u32, 5, 0);
     simulator.transmit_client_event(1, 1011, state.vertical_speed as u32, 5, 0);
     simulator.transmit_client_event(1, 1012, state.airspeed as u32, 5, 0);
-    radio_panel.set_window(0, &format!("{:>5}", state.airspeed));
-    radio_panel.set_window(1, &format!("  {:0>3}", state.heading));
+    radio_panel.set_window(Window::TopLeft, &format!("{:>5}", state.airspeed));
+    radio_panel.set_window(Window::TopRight, &format!("  {:0>3}", state.heading));
 
     let selected_indicator_altitude = match state.selected_setting {
         AutopilotValue::Altitude => ".",
@@ -471,21 +479,21 @@ fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel
     };
 
     radio_panel.set_window(
-        2,
+        Window::BottomLeft,
         &format!("{:0>5}{}", state.altitude, selected_indicator_altitude),
     );
 
     // make sure formatting is the same as in an Airbus (align right, always display 4 digits, sign in front)
     match state.vertical_speed {
         s if s >= 0 => radio_panel.set_window(
-            3,
+            Window::BottomRight,
             &format!(
                 " {:0>4}{}",
                 state.vertical_speed, selected_indicator_vertical_speed
             ),
         ),
         s if s < 0 => radio_panel.set_window(
-            3,
+            Window::BottomRight,
             &format!(
                 "{:05}{}",
                 state.vertical_speed, selected_indicator_vertical_speed
@@ -543,9 +551,9 @@ fn handle_nav_frequency_input(
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
+    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 108, 117);
     frequency_state.standby_fractional_part =
-        wrap(frequency_state.standby_fractional_part, 0, 1000);
+        wrap(frequency_state.standby_fractional_part, 0, 100);
 }
 
 fn handle_autopilot_input(
@@ -646,8 +654,8 @@ fn display_values(
     let active_frequency = format!("{}.{}", active_whole, active_fract);
     let standby_whole = standby_whole.to_string()[1..].to_string(); // truncate first digit because display can only display 5
     let standby_frequency = format!("{}.{}", standby_whole, standby_fract);
-    radio_panel.set_window(window_active as usize, &active_frequency);
-    radio_panel.set_window(window_standby as usize, &standby_frequency);
+    radio_panel.set_window(window_active, &active_frequency);
+    radio_panel.set_window(window_standby, &standby_frequency);
     radio_panel.update_all_windows();
 
     return true;
@@ -665,7 +673,14 @@ fn swap_frequencies(frequency_state: &mut FrequencyState) {
 /// Show only dashes to indicate no data recieved from sim yet
 fn show_standby_screen(radio_panel: &mut RadioPanel) {
     for window_index in 0..4 {
-        radio_panel.set_window(window_index, "-----");
+        let window= match window_index {
+            0 => Window::TopLeft,
+            1 => Window::TopRight,
+            2 => Window::BottomLeft,
+            3 => Window::BottomRight,
+            _ => Window::TopLeft,
+        };
+        radio_panel.set_window(window, "-----");
     }
     radio_panel.update_all_windows();
 }

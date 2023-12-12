@@ -1,5 +1,7 @@
 use hidapi::{HidApi, HidDevice};
-use std::process;
+use std::{process, os::windows};
+
+use crate::Window;
 
 use super::{
     constants::*,
@@ -152,14 +154,15 @@ impl RadioPanel {
     /// value can contain up to 5 digits from 0-9 and an optional point.
     /// Can also be a blank space or a dash
     /// Examples: 12345, 123.45, 1.2.3.4.5., 12 45, 12-45
-    pub fn set_window(&mut self, window_index: usize, value: &str) {
-        self.set_window_additively(window_index, "     "); // clean window contents
-        self.set_window_additively(window_index, value);
+    pub fn set_window(&mut self, window: Window, value: &str) {
+        self.set_window_additively(window, "     "); // clean window contents
+        self.set_window_additively(window, value);
     }
 
     /// Draws the values into a window without clearing it
     /// If not all digits are set, previous digits can remain
-    fn set_window_additively(&mut self, window_index: usize, value: &str) {
+    fn set_window_additively(&mut self, window: Window, value: &str) {
+        let window_index = window as usize;
         let mut display_index = 0;
 
         for character in value.chars() {
@@ -204,9 +207,10 @@ impl RadioPanel {
     }
 
     pub fn clear_all_windows(&mut self) {
-        for window_index in 0..4 {
-            self.set_window(window_index, "     ");
-        }
+        self.set_window(Window::TopLeft, "     ");
+        self.set_window(Window::TopRight, "     ");
+        self.set_window(Window::BottomLeft, "     ");
+        self.set_window(Window::TopLeft, "     ");
         self.update_all_windows();
     }
 }
