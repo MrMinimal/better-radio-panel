@@ -69,11 +69,6 @@ struct PlaneState {
     autopilot_state: AutopilotState,
 }
 
-struct DataStruct {
-    lat: f64,
-    lon: f64,
-    alt: f64,
-}
 
 fn main() {
     let mut radio_panel = RadioPanel::new();
@@ -84,7 +79,7 @@ fn main() {
     let mut input = InputState::new();
     loop {
         if connected_to_sim {
-            input = match radio_panel.wait_for_input() {
+            input = match radio_panel.block_until_input() {
                 Some(updated_input_state) => updated_input_state,
                 None => input,
             };

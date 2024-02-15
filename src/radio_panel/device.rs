@@ -71,7 +71,7 @@ impl RadioPanel {
 
     /// Blocking call to wait for input from buttons or rotaries
     /// Returns the current state of all buttons and potis on the hardware
-    pub fn wait_for_input(&mut self) -> Option<InputState> {
+    pub fn block_until_input(&mut self) -> Option<InputState> {
         let mut input_buffer = [0u8; 3];
         self.hid_device
             .read_timeout(&mut input_buffer, 300)
