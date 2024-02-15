@@ -29,9 +29,9 @@ enum Window {
 }
 
 struct FrequencyState {
-    standby_whole_part: i16,
+    standby_integer_part: i16,
     standby_fractional_part: i16,
-    active_whole_part: i16,
+    active_integer_part: i16,
     active_fractional_part: i16,
 }
 
@@ -336,33 +336,33 @@ fn setup_simulator_event_ids(simulator: &mut SimConnector) {
 fn plane_default_state() -> PlaneState {
     PlaneState {
         com1_state: FrequencyState {
-            standby_whole_part: 118,
+            standby_integer_part: 118,
             standby_fractional_part: 000,
-            active_whole_part: 118,
+            active_integer_part: 118,
             active_fractional_part: 000,
         },
         com2_state: FrequencyState {
-            standby_whole_part: 118,
+            standby_integer_part: 118,
             standby_fractional_part: 000,
-            active_whole_part: 118,
+            active_integer_part: 118,
             active_fractional_part: 000,
         },
         nav1_state: FrequencyState {
-            standby_whole_part: 108,
+            standby_integer_part: 108,
             standby_fractional_part: 000,
-            active_whole_part: 108,
+            active_integer_part: 108,
             active_fractional_part: 000,
         },
         nav2_state: FrequencyState {
-            standby_whole_part: 108,
+            standby_integer_part: 108,
             standby_fractional_part: 000,
-            active_whole_part: 108,
+            active_integer_part: 108,
             active_fractional_part: 000,
         },
         adf_state: FrequencyState {
-            standby_whole_part: 118,
+            standby_integer_part: 118,
             standby_fractional_part: 000,
-            active_whole_part: 118,
+            active_integer_part: 118,
             active_fractional_part: 000,
         },
         dme_state: DmeState { distance: 0.0 },
@@ -516,7 +516,7 @@ fn handle_com_frequency_input(
         swap_frequencies(frequency_state);
     }
 
-    frequency_state.standby_whole_part += match outer_rotary {
+    frequency_state.standby_integer_part += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
@@ -527,7 +527,7 @@ fn handle_com_frequency_input(
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 118, 137);
+    frequency_state.standby_integer_part = wrap(frequency_state.standby_integer_part, 118, 137);
     frequency_state.standby_fractional_part =
         wrap(frequency_state.standby_fractional_part, 0, 1000);
 }
@@ -542,7 +542,7 @@ fn handle_nav_frequency_input(
         swap_frequencies(frequency_state);
     }
 
-    frequency_state.standby_whole_part += match outer_rotary {
+    frequency_state.standby_integer_part += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
@@ -553,7 +553,7 @@ fn handle_nav_frequency_input(
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 108, 118);
+    frequency_state.standby_integer_part = wrap(frequency_state.standby_integer_part, 108, 118);
     frequency_state.standby_fractional_part = wrap(frequency_state.standby_fractional_part, 0, 100);
 }
 
@@ -629,19 +629,19 @@ fn display_values(
     standby_event_id: u32,
 ) -> bool {
     // More consise variable names
-    let active_whole = frequency_state.active_whole_part;
+    let active_integer = frequency_state.active_integer_part;
     let active_fract = frequency_state.active_fractional_part;
-    let standby_whole = frequency_state.standby_whole_part;
+    let standby_integer = frequency_state.standby_integer_part;
     let standby_fract = frequency_state.standby_fractional_part;
 
     // Format for FS2020
-    let active_whole = format!("{:0>3}", active_whole);
+    let active_integer = format!("{:0>3}", active_integer);
     let active_fract = format!("{:0>3}", active_fract);
-    let active_frequency = format!("{}{}000", active_whole, active_fract);
+    let active_frequency = format!("{}{}000", active_integer, active_fract);
     let active_frequency = parse::<u32>(&active_frequency).unwrap();
-    let standby_whole = format!("{:0>3}", standby_whole);
+    let standby_integer = format!("{:0>3}", standby_integer);
     let standby_fract = format!("{:0>3}", standby_fract);
-    let standby_frequency = format!("{}{}000", standby_whole, standby_fract);
+    let standby_frequency = format!("{}{}000", standby_integer, standby_fract);
     let standby_frequency = parse::<u32>(&standby_frequency).unwrap();
     if !simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0) {
         return false;
@@ -651,10 +651,10 @@ fn display_values(
     }
 
     // Format for hardware
-    let active_whole = active_whole.to_string()[1..].to_string(); // truncate first digit because display can only display 5
-    let active_frequency = format!("{}.{}", active_whole, active_fract);
-    let standby_whole = standby_whole.to_string()[1..].to_string(); // truncate first digit because display can only display 5
-    let standby_frequency = format!("{}.{}", standby_whole, standby_fract);
+    let active_integer = active_integer.to_string()[1..].to_string(); // truncate first digit because display can only display 5
+    let active_frequency = format!("{}.{}", active_integer, active_fract);
+    let standby_integer = standby_integer.to_string()[1..].to_string(); // truncate first digit because display can only display 5
+    let standby_frequency = format!("{}.{}", standby_integer, standby_fract);
     radio_panel.set_window(window_active, &active_frequency);
     radio_panel.set_window(window_standby, &standby_frequency);
     radio_panel.update_all_windows();
@@ -663,11 +663,11 @@ fn display_values(
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
-    let previous_active_whole = frequency_state.active_whole_part;
+    let previous_active_integer = frequency_state.active_integer_part;
     let previous_active_fract = frequency_state.active_fractional_part;
-    frequency_state.active_whole_part = frequency_state.standby_whole_part;
+    frequency_state.active_integer_part = frequency_state.standby_integer_part;
     frequency_state.active_fractional_part = frequency_state.standby_fractional_part;
-    frequency_state.standby_whole_part = previous_active_whole;
+    frequency_state.standby_integer_part = previous_active_integer;
     frequency_state.standby_fractional_part = previous_active_fract;
 }
 
