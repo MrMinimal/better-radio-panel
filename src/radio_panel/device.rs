@@ -1,5 +1,6 @@
 use hidapi::{HidApi, HidDevice};
-use std::{process, os::windows};
+use core::panic;
+use std::{os::windows, process, thread::panicking};
 
 use crate::Window;
 
@@ -133,6 +134,7 @@ impl RadioPanel {
                     BITMASK_MODE_SELECTOR_UPPER_NAV2,
                     BITMASK_MODE_SELECTOR_UPPER_ADF,
                     BITMASK_MODE_SELECTOR_UPPER_DME,
+                    BITMASK_MODE_SELECTOR_UPPER_XPDR,
                 );
 
                 input_state.mode_selector_lower = parse_mode_selector_state(
@@ -143,6 +145,7 @@ impl RadioPanel {
                     BITMASK_MODE_SELECTOR_LOWER_NAV2,
                     BITMASK_MODE_SELECTOR_LOWER_ADF,
                     BITMASK_MODE_SELECTOR_LOWER_DME,
+                    BITMASK_MODE_SELECTOR_LOWER_XPDR,
                 );
 
                 return Some(input_state);
@@ -224,7 +227,7 @@ fn parse_mode_selector_state(
     bitmask_mode_selector_nav2: u32,
     bitmask_mode_selector_adf: u32,
     bitmask_mode_selector_dme: u32,
-    //bitmask_mode_selector_xpdr: u32,
+    bitmask_mode_selector_xpdr: u32,
 ) -> ModeSelectorState {
     if bitmask_applies(input_buffer, bitmask_mode_selector_com1) {
         ModeSelectorState::ModeSelectorCom1
@@ -238,8 +241,10 @@ fn parse_mode_selector_state(
         ModeSelectorState::ModeSelectorAdf
     } else if bitmask_applies(input_buffer, bitmask_mode_selector_dme) {
         ModeSelectorState::ModeSelectorDme
-    } else {
+    } else if bitmask_applies(input_buffer, bitmask_mode_selector_xpdr){
         ModeSelectorState::ModeSelectorXpdr
+    } else {
+        panic!("AAAAAAAAAAAAA")
     }
 }
 
