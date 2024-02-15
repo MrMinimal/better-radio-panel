@@ -1,5 +1,4 @@
 [package]
-simconnect = "0.1.3"
 name = "better-radio-panel"
 version = "0.0.1"
 authors = ["Tom Langwaldt"]

@@ -104,6 +104,7 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
+                        3,
                         &mut state.com1_state,
                         Window::TopLeft,
                         Window::TopRight,
@@ -121,6 +122,7 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
+                        3,
                         &mut state.com2_state,
                         Window::TopLeft,
                         Window::TopRight,
@@ -138,6 +140,7 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.nav1_state,
                         Window::TopLeft,
                         Window::TopRight,
@@ -155,6 +158,7 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.nav2_state,
                         Window::TopLeft,
                         Window::TopRight,
@@ -172,6 +176,7 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.adf_state,
                         Window::TopLeft,
                         Window::TopRight,
@@ -182,7 +187,12 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorDme => {
-                    dme_logic(&mut radio_panel, Window::TopLeft, Window::TopRight);
+                    dme_logic(
+                        &mut radio_panel,
+                        &mut state.dme_state,
+                        Window::TopLeft,
+                        Window::TopRight,
+                    );
                 }
                 ModeSelectorState::ModeSelectorXpdr => {
                     xpdr_logic(
@@ -205,6 +215,7 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
+                        3,
                         &mut state.com1_state,
                         Window::BottomLeft,
                         Window::BottomRight,
@@ -222,6 +233,7 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
+                        3,
                         &mut state.com2_state,
                         Window::BottomLeft,
                         Window::BottomRight,
@@ -239,6 +251,7 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.nav1_state,
                         Window::BottomLeft,
                         Window::BottomRight,
@@ -256,6 +269,7 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.nav2_state,
                         Window::BottomLeft,
                         Window::BottomRight,
@@ -273,6 +287,7 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
+                        2,
                         &mut state.adf_state,
                         Window::BottomLeft,
                         Window::BottomRight,
@@ -283,7 +298,12 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorDme => {
-                    dme_logic(&mut radio_panel, Window::BottomLeft, Window::BottomRight);
+                    dme_logic(
+                        &mut radio_panel,
+                        &state.dme_state,
+                        Window::BottomLeft,
+                        Window::BottomRight,
+                    );
                 }
                 ModeSelectorState::ModeSelectorXpdr => {
                     xpdr_logic(
@@ -456,9 +476,14 @@ fn xpdr_logic(
     radio_panel.update_all_windows();
 }
 
-fn dme_logic(radio_panel: &mut RadioPanel, window_active: Window, window_standby: Window) {
-    radio_panel.set_window(window_active, "   0.0");
-    radio_panel.set_window(window_standby, "    0");
+fn dme_logic(
+    radio_panel: &mut RadioPanel,
+    dme_state: &DmeState,
+    window_active: Window,
+    window_standby: Window,
+) {
+    radio_panel.set_window(window_active, &format!("   {}", dme_state.distance));
+    radio_panel.set_window(window_standby, "     ");
     radio_panel.update_all_windows();
 }
 
@@ -620,6 +645,7 @@ fn handle_autopilot_input(
 }
 
 fn display_values(
+    _fractional_digits: u8,
     frequency_state: &mut FrequencyState,
     window_active: Window,
     window_standby: Window,
