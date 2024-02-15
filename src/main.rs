@@ -333,33 +333,33 @@ fn plane_default_state() -> PlaneState {
     PlaneState {
         com1_state: FrequencyState {
             standby_whole_part: 118,
-            standby_fractional_part: 0,
+            standby_fractional_part: 000,
             active_whole_part: 118,
-            active_fractional_part: 0,
+            active_fractional_part: 000,
         },
         com2_state: FrequencyState {
             standby_whole_part: 118,
-            standby_fractional_part: 0,
+            standby_fractional_part: 000,
             active_whole_part: 118,
-            active_fractional_part: 0,
+            active_fractional_part: 000,
         },
         nav1_state: FrequencyState {
             standby_whole_part: 118,
-            standby_fractional_part: 0,
+            standby_fractional_part: 000,
             active_whole_part: 118,
-            active_fractional_part: 0,
+            active_fractional_part: 000,
         },
         nav2_state: FrequencyState {
             standby_whole_part: 118,
-            standby_fractional_part: 0,
+            standby_fractional_part: 000,
             active_whole_part: 118,
-            active_fractional_part: 0,
+            active_fractional_part: 000,
         },
         adf_state: FrequencyState {
             standby_whole_part: 118,
-            standby_fractional_part: 0,
+            standby_fractional_part: 000,
             active_whole_part: 118,
-            active_fractional_part: 0,
+            active_fractional_part: 000,
         },
         dme_state: DmeState { distance: 0.0 },
         xpdr_state: XpdrState {
