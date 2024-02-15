@@ -645,7 +645,7 @@ fn handle_autopilot_input(
 }
 
 fn display_values(
-    _fractional_digits: u8,
+    fractional_digits: u8,
     frequency_state: &mut FrequencyState,
     window_active: Window,
     window_standby: Window,
