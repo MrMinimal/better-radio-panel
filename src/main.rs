@@ -2,9 +2,8 @@ use parse_int::parse;
 use simconnect::{self, SimConnector};
 use std::{
     convert::TryInto,
-    fmt::{format, Result},
     thread,
-    time::{self, Duration},
+    time::{self},
 };
 
 use radio_panel::{
