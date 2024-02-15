@@ -8,6 +8,13 @@ use std::{
 };
 
 use radio_panel::{
+    constants::{
+        EVENT_ID_AP_ALT_VAR_SET_ENGLISH, EVENT_ID_AP_SPD_VAR_SET, EVENT_ID_AP_VS_VAR_SET_ENGLISH,
+        EVENT_ID_COM2_RADIO_SET_HZ, EVENT_ID_COM2_STBY_RADIO_SET_HZ, EVENT_ID_COM_RADIO_SET_HZ,
+        EVENT_ID_COM_STBY_RADIO_SET_HZ, EVENT_ID_HEADING_BUG_SET, EVENT_ID_NAV1_RADIO_SET_HZ,
+        EVENT_ID_NAV1_STBY_SET_HZ, EVENT_ID_NAV2_RADIO_SET_HZ, EVENT_ID_NAV2_STBY_SET_HZ,
+        EVENT_ID_XPNDR_SET,
+    },
     device::{InputState, RadioPanel},
     input_states::{ButtonState, ModeSelectorState, RotaryState},
 };
@@ -313,20 +320,24 @@ fn main() {
 
 fn setup_simulator_event_ids(simulator: &mut SimConnector) {
     // Tell simulator which event ID is supposed to represent what simulator event
-    simulator.map_client_event_to_sim_event(1000, "COM_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1001, "COM_STBY_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1002, "COM2_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1003, "COM2_STBY_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1004, "NAV1_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1005, "NAV1_STBY_SET_HZ");
-    simulator.map_client_event_to_sim_event(1006, "NAV2_RADIO_SET_HZ");
-    simulator.map_client_event_to_sim_event(1007, "NAV2_STBY_SET_HZ");
-    simulator.map_client_event_to_sim_event(1008, "XPNDR_SET");
+    simulator.map_client_event_to_sim_event(EVENT_ID_COM_RADIO_SET_HZ, "COM_RADIO_SET_HZ");
+    simulator
+        .map_client_event_to_sim_event(EVENT_ID_COM_STBY_RADIO_SET_HZ, "COM_STBY_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_COM2_RADIO_SET_HZ, "COM2_RADIO_SET_HZ");
+    simulator
+        .map_client_event_to_sim_event(EVENT_ID_COM2_STBY_RADIO_SET_HZ, "COM2_STBY_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_NAV1_RADIO_SET_HZ, "NAV1_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_NAV1_STBY_SET_HZ, "NAV1_STBY_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_NAV2_RADIO_SET_HZ, "NAV2_RADIO_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_NAV2_STBY_SET_HZ, "NAV2_STBY_SET_HZ");
+    simulator.map_client_event_to_sim_event(EVENT_ID_XPNDR_SET, "XPNDR_SET");
 
-    simulator.map_client_event_to_sim_event(1009, "HEADING_BUG_SET");
-    simulator.map_client_event_to_sim_event(1010, "AP_ALT_VAR_SET_ENGLISH");
-    simulator.map_client_event_to_sim_event(1011, "AP_VS_VAR_SET_ENGLISH");
-    simulator.map_client_event_to_sim_event(1012, "AP_SPD_VAR_SET");
+    simulator.map_client_event_to_sim_event(EVENT_ID_HEADING_BUG_SET, "HEADING_BUG_SET");
+    simulator
+        .map_client_event_to_sim_event(EVENT_ID_AP_ALT_VAR_SET_ENGLISH, "AP_ALT_VAR_SET_ENGLISH");
+    simulator
+        .map_client_event_to_sim_event(EVENT_ID_AP_VS_VAR_SET_ENGLISH, "AP_VS_VAR_SET_ENGLISH");
+    simulator.map_client_event_to_sim_event(EVENT_ID_AP_SPD_VAR_SET, "AP_SPD_VAR_SET");
 }
 
 fn plane_default_state() -> PlaneState {

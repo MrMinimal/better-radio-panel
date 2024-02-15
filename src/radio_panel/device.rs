@@ -241,7 +241,10 @@ fn parse_mode_selector_state(
     } else if bitmask_applies(input_buffer, bitmask_mode_selector_xpdr) {
         ModeSelectorState::ModeSelectorXpdr
     } else {
-        panic!("Error in input mask parsing. Unknown bitmask: {:#034b}", input_buffer)
+        panic!(
+            "Error in input mask parsing. Unknown bitmask: {:#034b}",
+            input_buffer
+        )
     }
 }
 
