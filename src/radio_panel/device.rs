@@ -1,5 +1,5 @@
-use hidapi::{HidApi, HidDevice};
 use core::panic;
+use hidapi::{HidApi, HidDevice};
 use std::{os::windows, process, thread::panicking};
 
 use crate::Window;
@@ -83,74 +83,71 @@ impl RadioPanel {
             | (input_buffer[2] as u32);
         // println!("{:#034b}", buffer)
 
-        match input_buffer {
-            NO_INPUTS_AFTER_TIMEOUT => return None,
-            _ => {
-                let mut input_state = InputState {
-                    mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
-                    mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
-                    rotary_upper_inner: RotaryState::None,
-                    rotary_upper_outer: RotaryState::None,
-                    rotary_lower_inner: RotaryState::None,
-                    rotary_lower_outer: RotaryState::None,
-                    button_upper: ButtonState::Released,
-                    button_lower: ButtonState::Released,
-                };
-
-                input_state.button_upper =
-                    parse_button_state(input_buffer, BITMASK_BUTTON_UPPER_PRESSED);
-                input_state.button_lower =
-                    parse_button_state(input_buffer, BITMASK_BUTTON_LOWER_PRESSED);
-
-                input_state.rotary_upper_inner = parse_rotary_state(
-                    input_buffer,
-                    BITMASK_ROTARY_UPPER_INNER_CLOCKWISE,
-                    BITMASK_ROTARY_UPPER_INNER_COUNTERCLOCKWISE,
-                );
-
-                input_state.rotary_upper_outer = parse_rotary_state(
-                    input_buffer,
-                    BITMASK_ROTARY_UPPER_OUTER_CLOCKWISE,
-                    BITMASK_ROTARY_UPPER_OUTER_COUNTERCLOCKWISE,
-                );
-
-                input_state.rotary_lower_inner = parse_rotary_state(
-                    input_buffer,
-                    BITMASK_ROTARY_LOWER_INNER_CLOCKWISE,
-                    BITMASK_ROTARY_LOWER_INNER_COUNTERCLOCKWISE,
-                );
-
-                input_state.rotary_lower_outer = parse_rotary_state(
-                    input_buffer,
-                    BITMASK_ROTARY_LOWER_OUTER_CLOCKWISE,
-                    BITMASK_ROTARY_LOWER_OUTER_COUNTERCLOCKWISE,
-                );
-
-                input_state.mode_selector_upper = parse_mode_selector_state(
-                    input_buffer,
-                    BITMASK_MODE_SELECTOR_UPPER_COM1,
-                    BITMASK_MODE_SELECTOR_UPPER_COM2,
-                    BITMASK_MODE_SELECTOR_UPPER_NAV1,
-                    BITMASK_MODE_SELECTOR_UPPER_NAV2,
-                    BITMASK_MODE_SELECTOR_UPPER_ADF,
-                    BITMASK_MODE_SELECTOR_UPPER_DME,
-                    BITMASK_MODE_SELECTOR_UPPER_XPDR,
-                );
-
-                input_state.mode_selector_lower = parse_mode_selector_state(
-                    input_buffer,
-                    BITMASK_MODE_SELECTOR_LOWER_COM1,
-                    BITMASK_MODE_SELECTOR_LOWER_COM2,
-                    BITMASK_MODE_SELECTOR_LOWER_NAV1,
-                    BITMASK_MODE_SELECTOR_LOWER_NAV2,
-                    BITMASK_MODE_SELECTOR_LOWER_ADF,
-                    BITMASK_MODE_SELECTOR_LOWER_DME,
-                    BITMASK_MODE_SELECTOR_LOWER_XPDR,
-                );
-
-                return Some(input_state);
-            }
+        if input_buffer == NO_INPUTS_AFTER_TIMEOUT {
+            return None;
         }
+
+        let mut input_state = InputState {
+            mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
+            mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
+            rotary_upper_inner: RotaryState::None,
+            rotary_upper_outer: RotaryState::None,
+            rotary_lower_inner: RotaryState::None,
+            rotary_lower_outer: RotaryState::None,
+            button_upper: ButtonState::Released,
+            button_lower: ButtonState::Released,
+        };
+
+        input_state.button_upper = parse_button_state(input_buffer, BITMASK_BUTTON_UPPER_PRESSED);
+        input_state.button_lower = parse_button_state(input_buffer, BITMASK_BUTTON_LOWER_PRESSED);
+
+        input_state.rotary_upper_inner = parse_rotary_state(
+            input_buffer,
+            BITMASK_ROTARY_UPPER_INNER_CLOCKWISE,
+            BITMASK_ROTARY_UPPER_INNER_COUNTERCLOCKWISE,
+        );
+
+        input_state.rotary_upper_outer = parse_rotary_state(
+            input_buffer,
+            BITMASK_ROTARY_UPPER_OUTER_CLOCKWISE,
+            BITMASK_ROTARY_UPPER_OUTER_COUNTERCLOCKWISE,
+        );
+
+        input_state.rotary_lower_inner = parse_rotary_state(
+            input_buffer,
+            BITMASK_ROTARY_LOWER_INNER_CLOCKWISE,
+            BITMASK_ROTARY_LOWER_INNER_COUNTERCLOCKWISE,
+        );
+
+        input_state.rotary_lower_outer = parse_rotary_state(
+            input_buffer,
+            BITMASK_ROTARY_LOWER_OUTER_CLOCKWISE,
+            BITMASK_ROTARY_LOWER_OUTER_COUNTERCLOCKWISE,
+        );
+
+        input_state.mode_selector_upper = parse_mode_selector_state(
+            input_buffer,
+            BITMASK_MODE_SELECTOR_UPPER_COM1,
+            BITMASK_MODE_SELECTOR_UPPER_COM2,
+            BITMASK_MODE_SELECTOR_UPPER_NAV1,
+            BITMASK_MODE_SELECTOR_UPPER_NAV2,
+            BITMASK_MODE_SELECTOR_UPPER_ADF,
+            BITMASK_MODE_SELECTOR_UPPER_DME,
+            BITMASK_MODE_SELECTOR_UPPER_XPDR,
+        );
+
+        input_state.mode_selector_lower = parse_mode_selector_state(
+            input_buffer,
+            BITMASK_MODE_SELECTOR_LOWER_COM1,
+            BITMASK_MODE_SELECTOR_LOWER_COM2,
+            BITMASK_MODE_SELECTOR_LOWER_NAV1,
+            BITMASK_MODE_SELECTOR_LOWER_NAV2,
+            BITMASK_MODE_SELECTOR_LOWER_ADF,
+            BITMASK_MODE_SELECTOR_LOWER_DME,
+            BITMASK_MODE_SELECTOR_LOWER_XPDR,
+        );
+
+        return Some(input_state);
     }
 
     /// Show values in window, previous values are cleared
@@ -241,7 +238,7 @@ fn parse_mode_selector_state(
         ModeSelectorState::ModeSelectorAdf
     } else if bitmask_applies(input_buffer, bitmask_mode_selector_dme) {
         ModeSelectorState::ModeSelectorDme
-    } else if bitmask_applies(input_buffer, bitmask_mode_selector_xpdr){
+    } else if bitmask_applies(input_buffer, bitmask_mode_selector_xpdr) {
         ModeSelectorState::ModeSelectorXpdr
     } else {
         panic!("AAAAAAAAAAAAA")

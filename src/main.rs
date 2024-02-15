@@ -361,9 +361,7 @@ fn plane_default_state() -> PlaneState {
             active_whole_part: 118,
             active_fractional_part: 0,
         },
-        dme_state: DmeState {
-            distance: 0.0,
-        },
+        dme_state: DmeState { distance: 0.0 },
         xpdr_state: XpdrState {
             code: [0; 4],
             selected_digit: 0,
@@ -382,7 +380,7 @@ fn show_connecting_animation(radio_panel: &mut RadioPanel) {
     radio_panel.clear_all_windows();
 
     for window_index in 0..4 {
-        let window= match window_index {
+        let window = match window_index {
             0 => Window::TopLeft,
             1 => Window::TopRight,
             2 => Window::BottomLeft,
@@ -552,8 +550,7 @@ fn handle_nav_frequency_input(
     };
 
     frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 108, 118);
-    frequency_state.standby_fractional_part =
-        wrap(frequency_state.standby_fractional_part, 0, 100);
+    frequency_state.standby_fractional_part = wrap(frequency_state.standby_fractional_part, 0, 100);
 }
 
 fn handle_autopilot_input(
@@ -673,7 +670,7 @@ fn swap_frequencies(frequency_state: &mut FrequencyState) {
 /// Show only dashes to indicate no data recieved from sim yet
 fn show_standby_screen(radio_panel: &mut RadioPanel) {
     for window_index in 0..4 {
-        let window= match window_index {
+        let window = match window_index {
             0 => Window::TopLeft,
             1 => Window::TopRight,
             2 => Window::BottomLeft,
