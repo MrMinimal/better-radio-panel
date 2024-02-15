@@ -1,6 +1,6 @@
 use core::panic;
 use hidapi::{HidApi, HidDevice};
-use std::{process};
+use std::process;
 
 use crate::Window;
 

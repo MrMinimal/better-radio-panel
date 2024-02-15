@@ -68,7 +68,6 @@ struct PlaneState {
     autopilot_state: AutopilotState,
 }
 
-
 fn main() {
     let mut radio_panel = RadioPanel::new();
     let mut state = plane_default_state();
