@@ -363,7 +363,7 @@ fn plane_default_state() -> PlaneState {
         },
         dme_state: DmeState { distance: 0.0 },
         xpdr_state: XpdrState {
-            code: [0; 4],
+            code: [1, 2, 3, 4],
             selected_digit: 0,
         },
         autopilot_state: AutopilotState {
