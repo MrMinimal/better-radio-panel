@@ -344,15 +344,15 @@ fn plane_default_state() -> PlaneState {
             active_fractional_part: 000,
         },
         nav1_state: FrequencyState {
-            standby_whole_part: 118,
+            standby_whole_part: 108,
             standby_fractional_part: 000,
-            active_whole_part: 118,
+            active_whole_part: 108,
             active_fractional_part: 000,
         },
         nav2_state: FrequencyState {
-            standby_whole_part: 118,
+            standby_whole_part: 108,
             standby_fractional_part: 000,
-            active_whole_part: 118,
+            active_whole_part: 108,
             active_fractional_part: 000,
         },
         adf_state: FrequencyState {
