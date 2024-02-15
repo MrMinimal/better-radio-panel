@@ -551,7 +551,7 @@ fn handle_nav_frequency_input(
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 108, 117);
+    frequency_state.standby_whole_part = wrap(frequency_state.standby_whole_part, 108, 118);
     frequency_state.standby_fractional_part =
         wrap(frequency_state.standby_fractional_part, 0, 100);
 }
