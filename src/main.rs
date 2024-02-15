@@ -109,8 +109,8 @@ fn main() {
                         Window::TopRight,
                         &mut radio_panel,
                         &simulator,
-                        1000,
-                        1001,
+                        EVENT_ID_COM_RADIO_SET_HZ,
+                        EVENT_ID_COM_STBY_RADIO_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
@@ -126,8 +126,8 @@ fn main() {
                         Window::TopRight,
                         &mut radio_panel,
                         &simulator,
-                        1002,
-                        1003,
+                        EVENT_ID_COM2_RADIO_SET_HZ,
+                        EVENT_ID_COM2_STBY_RADIO_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
@@ -143,8 +143,8 @@ fn main() {
                         Window::TopRight,
                         &mut radio_panel,
                         &simulator,
-                        1000,
-                        1000,
+                        EVENT_ID_NAV1_RADIO_SET_HZ,
+                        EVENT_ID_NAV1_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -160,8 +160,8 @@ fn main() {
                         Window::TopRight,
                         &mut radio_panel,
                         &simulator,
-                        1000,
-                        1000,
+                        EVENT_ID_NAV2_RADIO_SET_HZ,
+                        EVENT_ID_NAV2_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
@@ -210,8 +210,8 @@ fn main() {
                         Window::BottomRight,
                         &mut radio_panel,
                         &simulator,
-                        1000,
-                        1001,
+                        EVENT_ID_COM_RADIO_SET_HZ,
+                        EVENT_ID_COM_STBY_RADIO_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
@@ -227,8 +227,8 @@ fn main() {
                         Window::BottomRight,
                         &mut radio_panel,
                         &simulator,
-                        1002,
-                        1003,
+                        EVENT_ID_COM2_RADIO_SET_HZ,
+                        EVENT_ID_COM2_STBY_RADIO_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
@@ -244,8 +244,8 @@ fn main() {
                         Window::BottomRight,
                         &mut radio_panel,
                         &simulator,
-                        1004,
-                        1005,
+                        EVENT_ID_NAV1_RADIO_SET_HZ,
+                        EVENT_ID_NAV1_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -261,8 +261,8 @@ fn main() {
                         Window::BottomRight,
                         &mut radio_panel,
                         &simulator,
-                        1006,
-                        1007,
+                        EVENT_ID_NAV2_RADIO_SET_HZ,
+                        EVENT_ID_NAV2_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
