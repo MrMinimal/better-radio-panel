@@ -443,8 +443,9 @@ fn dme_logic(
     window_active: Window,
     window_standby: Window,
 ) {
-    radio_panel.set_window(window_active, &format!("   {}", dme_state.distance));
-    radio_panel.set_window(window_standby, "     ");
+    let formatted_distance = format!("   {:.1}", dme_state.distance);
+    radio_panel.set_window(window_active, "     ");
+    radio_panel.set_window(window_standby, &formatted_distance);
     radio_panel.update_all_windows();
 }
 
