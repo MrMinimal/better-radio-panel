@@ -21,7 +21,7 @@ pub struct AutopilotState {
     pub heading: i16,
     pub altitude: i32,
     pub vertical_speed: i16,
-    pub selected_setting: AutopilotValue,
+    selected_setting: AutopilotValue,
 }
 
 enum AutopilotValue {
@@ -693,12 +693,9 @@ fn display_adf_values(
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
-    let previous_active_integer = frequency_state.active_freq.integer;
-    let previous_active_fract = frequency_state.active_freq.fractional;
-    frequency_state.active_freq.integer = frequency_state.standby_freq.integer;
-    frequency_state.active_freq.fractional = frequency_state.standby_freq.fractional;
-    frequency_state.standby_freq.integer = previous_active_integer;
-    frequency_state.standby_freq.fractional = previous_active_fract;
+    let previous_active_freq = frequency_state.active_freq;
+    frequency_state.active_freq = frequency_state.standby_freq;
+    frequency_state.standby_freq = previous_active_freq;
 }
 
 /// Show only dashes to indicate no data recieved from sim yet
