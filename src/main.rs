@@ -29,6 +29,11 @@ struct FrequencyState {
     active_fractional_part: i16,
 }
 
+struct AdfState {
+    active_frequency: i16,
+    standby_frequency: i16,
+}
+
 struct DmeState {
     distance: f32,
 }
@@ -56,7 +61,7 @@ struct PlaneState {
     com2_state: FrequencyState,
     nav1_state: FrequencyState,
     nav2_state: FrequencyState,
-    adf_state: FrequencyState,
+    adf_state: AdfState,
     dme_state: DmeState,
     xpdr_state: XpdrState,
     autopilot_state: AutopilotState,
@@ -155,21 +160,11 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
-                    handle_com_frequency_input(
-                        &mut state.adf_state,
-                        input.button_upper,
-                        input.rotary_upper_outer,
-                        input.rotary_upper_inner,
-                    );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_adf_values(
                         &mut state.adf_state,
                         Window::TopLeft,
                         Window::TopRight,
                         &mut radio_panel,
-                        &simulator,
-                        1000,
-                        1000,
                     );
                 }
                 ModeSelectorState::ModeSelectorDme => {
@@ -258,21 +253,11 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
-                    handle_com_frequency_input(
-                        &mut state.adf_state,
-                        input.button_lower,
-                        input.rotary_lower_outer,
-                        input.rotary_lower_inner,
-                    );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_adf_values(
                         &mut state.adf_state,
                         Window::BottomLeft,
                         Window::BottomRight,
                         &mut radio_panel,
-                        &simulator,
-                        1000,
-                        1000,
                     );
                 }
                 ModeSelectorState::ModeSelectorDme => {
@@ -357,11 +342,9 @@ fn plane_default_state() -> PlaneState {
             active_integer_part: 108,
             active_fractional_part: 000,
         },
-        adf_state: FrequencyState {
-            standby_integer_part: 118,
-            standby_fractional_part: 000,
-            active_integer_part: 118,
-            active_fractional_part: 000,
+        adf_state: AdfState {
+            active_frequency: 123,
+            standby_frequency: 123,
         },
         dme_state: DmeState { distance: 0.0 },
         xpdr_state: XpdrState {
@@ -691,6 +674,27 @@ fn display_nav_values(
     radio_panel.set_window(
         window_standby,
         &format!("{}.{}", standby_integer, standby_fract),
+    );
+
+    radio_panel.update_all_windows();
+
+    return true;
+}
+
+fn display_adf_values(
+    adf_state: &mut AdfState,
+    window_active: Window,
+    window_standby: Window,
+    radio_panel: &mut RadioPanel,
+) -> bool {
+    radio_panel.set_window(
+        window_active,
+        &format!("{: >5}", adf_state.active_frequency),
+    );
+
+    radio_panel.set_window(
+        window_standby,
+        &format!("{: >5}", adf_state.standby_frequency),
     );
 
     radio_panel.update_all_windows();
