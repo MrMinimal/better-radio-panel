@@ -1,7 +1,6 @@
 use parse_int::parse;
 use simconnect::{self, SimConnector};
 use std::{
-    convert::TryInto,
     thread,
     time::{self},
 };
@@ -10,45 +9,18 @@ use radio_panel::{
     constants::*,
     device::{InputState, RadioPanel},
     input_states::{ButtonState, ModeSelectorState, RotaryState},
+    windows::*,
+    states::*,
 };
 
 mod radio_panel;
 
-#[derive(Copy, Clone)]
-enum Window {
-    TopLeft,
-    TopRight,
-    BottomLeft,
-    BottomRight,
-}
-
-struct FrequencyState {
-    standby_integer_part: i16,
-    standby_fractional_part: i16,
-    active_integer_part: i16,
-    active_fractional_part: i16,
-}
-
-struct AdfState {
-    active_frequency: i16,
-    standby_frequency: i16,
-}
-
-struct DmeState {
-    distance: f32,
-}
-
-struct XpdrState {
-    code: [i8; 4],
-    selected_digit: usize,
-}
-
-struct AutopilotState {
-    airspeed: i16,
-    heading: i16,
-    altitude: i32,
-    vertical_speed: i16,
-    selected_setting: AutopilotValue,
+pub struct AutopilotState {
+    pub airspeed: i16,
+    pub heading: i16,
+    pub altitude: i32,
+    pub vertical_speed: i16,
+    pub selected_setting: AutopilotValue,
 }
 
 enum AutopilotValue {
