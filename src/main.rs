@@ -8,9 +8,10 @@ use std::{
 use radio_panel::{
     constants::*,
     device::{InputState, RadioPanel},
+    frequency::Frequency,
     input_states::{ButtonState, ModeSelectorState, RotaryState},
-    windows::*,
     states::*,
+    windows::*,
 };
 
 mod radio_panel;
@@ -291,28 +292,44 @@ fn setup_simulator_event_ids(simulator: &mut SimConnector) {
 fn plane_default_state() -> PlaneState {
     PlaneState {
         com1_state: FrequencyState {
-            standby_integer_part: 118,
-            standby_fractional_part: 000,
-            active_integer_part: 118,
-            active_fractional_part: 000,
+            standby_freq: Frequency {
+                integer: 118,
+                fractional: 000,
+            },
+            active_freq: Frequency {
+                integer: 118,
+                fractional: 000,
+            },
         },
         com2_state: FrequencyState {
-            standby_integer_part: 118,
-            standby_fractional_part: 000,
-            active_integer_part: 118,
-            active_fractional_part: 000,
+            standby_freq: Frequency {
+                integer: 118,
+                fractional: 000,
+            },
+            active_freq: Frequency {
+                integer: 118,
+                fractional: 000,
+            },
         },
         nav1_state: FrequencyState {
-            standby_integer_part: 108,
-            standby_fractional_part: 000,
-            active_integer_part: 108,
-            active_fractional_part: 000,
+            standby_freq: Frequency {
+                integer: 108,
+                fractional: 000,
+            },
+            active_freq: Frequency {
+                integer: 108,
+                fractional: 000,
+            },
         },
         nav2_state: FrequencyState {
-            standby_integer_part: 108,
-            standby_fractional_part: 000,
-            active_integer_part: 108,
-            active_fractional_part: 000,
+            standby_freq: Frequency {
+                integer: 108,
+                fractional: 000,
+            },
+            active_freq: Frequency {
+                integer: 108,
+                fractional: 000,
+            },
         },
         adf_state: AdfState {
             active_frequency: 123,
@@ -320,7 +337,7 @@ fn plane_default_state() -> PlaneState {
         },
         dme_state: DmeState { distance: 0.0 },
         xpdr_state: XpdrState {
-            code: [1, 2, 3, 4],
+            code: [1, 0, 0, 0],
             selected_digit: 0,
         },
         autopilot_state: AutopilotState {
@@ -475,20 +492,20 @@ fn handle_com_frequency_input(
         swap_frequencies(frequency_state);
     }
 
-    frequency_state.standby_integer_part += match outer_rotary {
+    frequency_state.standby_freq.integer += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    frequency_state.standby_fractional_part += match inner_rotary {
+    frequency_state.standby_freq.fractional += match inner_rotary {
         RotaryState::Clockwise => 5,
         RotaryState::CounterClockwise => -5,
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_integer_part = wrap(frequency_state.standby_integer_part, 118, 137);
-    frequency_state.standby_fractional_part =
-        wrap(frequency_state.standby_fractional_part, 0, 1000);
+    frequency_state.standby_freq.integer = wrap(frequency_state.standby_freq.integer, 118, 137);
+    frequency_state.standby_freq.fractional =
+        wrap(frequency_state.standby_freq.fractional, 0, 1000);
 }
 
 fn handle_nav_frequency_input(
@@ -501,20 +518,20 @@ fn handle_nav_frequency_input(
         swap_frequencies(frequency_state);
     }
 
-    frequency_state.standby_integer_part += match outer_rotary {
+    frequency_state.standby_freq.integer += match outer_rotary {
         RotaryState::Clockwise => 1,
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    frequency_state.standby_fractional_part += match inner_rotary {
+    frequency_state.standby_freq.fractional += match inner_rotary {
         RotaryState::Clockwise => 50,
         RotaryState::CounterClockwise => -50,
         RotaryState::None => 0,
     };
 
-    frequency_state.standby_integer_part = wrap(frequency_state.standby_integer_part, 108, 118);
-    frequency_state.standby_fractional_part =
-        wrap(frequency_state.standby_fractional_part, 0, 1000);
+    frequency_state.standby_freq.integer = wrap(frequency_state.standby_freq.integer, 108, 118);
+    frequency_state.standby_freq.fractional =
+        wrap(frequency_state.standby_freq.fractional, 0, 1000);
 }
 
 fn handle_autopilot_input(
@@ -590,10 +607,10 @@ fn display_values(
     standby_event_id: u32,
 ) -> bool {
     // More consise variable names
-    let active_integer = frequency_state.active_integer_part;
-    let active_fract = frequency_state.active_fractional_part;
-    let standby_integer = frequency_state.standby_integer_part;
-    let standby_fract = frequency_state.standby_fractional_part;
+    let active_integer = frequency_state.active_freq.integer;
+    let active_fract = frequency_state.active_freq.fractional;
+    let standby_integer = frequency_state.standby_freq.integer;
+    let standby_fract = frequency_state.standby_freq.fractional;
 
     // Format for FS2020
     let active_integer = format!("{:0>3}", active_integer);
@@ -630,10 +647,10 @@ fn display_nav_values(
     radio_panel: &mut RadioPanel,
 ) -> bool {
     // More consise variable names
-    let active_integer = frequency_state.active_integer_part;
-    let active_fract = frequency_state.active_fractional_part;
-    let standby_integer = frequency_state.standby_integer_part;
-    let standby_fract = frequency_state.standby_fractional_part;
+    let active_integer = frequency_state.active_freq.integer;
+    let active_fract = frequency_state.active_freq.fractional;
+    let standby_integer = frequency_state.standby_freq.integer;
+    let standby_fract = frequency_state.standby_freq.fractional;
 
     let mut active_fract = format!("{:03}", active_fract);
     active_fract.truncate(2);
@@ -676,12 +693,12 @@ fn display_adf_values(
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
-    let previous_active_integer = frequency_state.active_integer_part;
-    let previous_active_fract = frequency_state.active_fractional_part;
-    frequency_state.active_integer_part = frequency_state.standby_integer_part;
-    frequency_state.active_fractional_part = frequency_state.standby_fractional_part;
-    frequency_state.standby_integer_part = previous_active_integer;
-    frequency_state.standby_fractional_part = previous_active_fract;
+    let previous_active_integer = frequency_state.active_freq.integer;
+    let previous_active_fract = frequency_state.active_freq.fractional;
+    frequency_state.active_freq.integer = frequency_state.standby_freq.integer;
+    frequency_state.active_freq.fractional = frequency_state.standby_freq.fractional;
+    frequency_state.standby_freq.integer = previous_active_integer;
+    frequency_state.standby_freq.fractional = previous_active_fract;
 }
 
 /// Show only dashes to indicate no data recieved from sim yet

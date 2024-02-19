@@ -1,8 +1,8 @@
+use crate::radio_panel::frequency::*;
+
 pub struct FrequencyState {
-    pub standby_integer_part: i16,
-    pub standby_fractional_part: i16,
-    pub active_integer_part: i16,
-    pub active_fractional_part: i16,
+    pub standby_freq: Frequency,
+    pub active_freq: Frequency,
 }
 
 pub struct AdfState {
