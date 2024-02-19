@@ -139,15 +139,11 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_nav_values(
                         &mut state.nav1_state,
                         Window::TopLeft,
                         Window::TopRight,
                         &mut radio_panel,
-                        &simulator,
-                        EVENT_ID_NAV1_RADIO_SET_HZ,
-                        EVENT_ID_NAV1_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -157,15 +153,11 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_nav_values(
                         &mut state.nav2_state,
                         Window::TopLeft,
                         Window::TopRight,
                         &mut radio_panel,
-                        &simulator,
-                        EVENT_ID_NAV2_RADIO_SET_HZ,
-                        EVENT_ID_NAV2_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
@@ -250,15 +242,11 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_nav_values(
                         &mut state.nav1_state,
                         Window::BottomLeft,
                         Window::BottomRight,
                         &mut radio_panel,
-                        &simulator,
-                        EVENT_ID_NAV1_RADIO_SET_HZ,
-                        EVENT_ID_NAV1_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -268,15 +256,11 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
-                    connected_to_sim = display_values(
-                        2,
+                    connected_to_sim = display_nav_values(
                         &mut state.nav2_state,
                         Window::BottomLeft,
                         Window::BottomRight,
                         &mut radio_panel,
-                        &simulator,
-                        EVENT_ID_NAV2_RADIO_SET_HZ,
-                        EVENT_ID_NAV2_STBY_SET_HZ,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
@@ -573,13 +557,14 @@ fn handle_nav_frequency_input(
         RotaryState::None => 0,
     };
     frequency_state.standby_fractional_part += match inner_rotary {
-        RotaryState::Clockwise => 5,
-        RotaryState::CounterClockwise => -5,
+        RotaryState::Clockwise => 50,
+        RotaryState::CounterClockwise => -50,
         RotaryState::None => 0,
     };
 
     frequency_state.standby_integer_part = wrap(frequency_state.standby_integer_part, 108, 118);
-    frequency_state.standby_fractional_part = wrap(frequency_state.standby_fractional_part, 0, 100);
+    frequency_state.standby_fractional_part =
+        wrap(frequency_state.standby_fractional_part, 0, 1000);
 }
 
 fn handle_autopilot_input(
@@ -645,7 +630,7 @@ fn handle_autopilot_input(
 }
 
 fn display_values(
-    fractional_digits: u8,
+    _fractional_digits: u8,
     frequency_state: &mut FrequencyState,
     window_active: Window,
     window_standby: Window,
@@ -683,6 +668,25 @@ fn display_values(
     let standby_frequency = format!("{}.{}", standby_integer, standby_fract);
     radio_panel.set_window(window_active, &active_frequency);
     radio_panel.set_window(window_standby, &standby_frequency);
+    radio_panel.update_all_windows();
+
+    return true;
+}
+
+fn display_nav_values(
+    frequency_state: &mut FrequencyState,
+    window_active: Window,
+    window_standby: Window,
+    radio_panel: &mut RadioPanel,
+) -> bool {
+    // More consise variable names
+    let _active_integer = frequency_state.active_integer_part;
+    let _active_fract = frequency_state.active_fractional_part;
+    let _standby_integer = frequency_state.standby_integer_part;
+    let _standby_fract = frequency_state.standby_fractional_part;
+
+    radio_panel.set_window(window_active, "12345");
+    radio_panel.set_window(window_standby, "67890");
     radio_panel.update_all_windows();
 
     return true;
