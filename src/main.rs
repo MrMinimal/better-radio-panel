@@ -1,10 +1,4 @@
 use parse_int::parse;
-use simconnect::{self, SimConnector};
-use std::{
-    thread,
-    time::{self},
-};
-
 use radio_panel::{
     constants::*,
     device::{InputState, RadioPanel},
@@ -12,6 +6,11 @@ use radio_panel::{
     input_states::{ButtonState, ModeSelectorState, RotaryState},
     states::*,
     windows::*,
+};
+use simconnect::{self, SimConnector};
+use std::{
+    thread,
+    time::{self},
 };
 
 mod radio_panel;
