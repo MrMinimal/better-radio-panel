@@ -680,12 +680,14 @@ fn display_nav_values(
     radio_panel: &mut RadioPanel,
 ) -> bool {
     // More consise variable names
-    let _active_integer = frequency_state.active_integer_part;
-    let _active_fract = frequency_state.active_fractional_part;
-    let _standby_integer = frequency_state.standby_integer_part;
-    let _standby_fract = frequency_state.standby_fractional_part;
+    let active_integer = frequency_state.active_integer_part;
+    let active_fract = frequency_state.active_fractional_part;
+    let standby_integer = frequency_state.standby_integer_part;
+    let standby_fract = frequency_state.standby_fractional_part;
 
-    radio_panel.set_window(window_active, "12345");
+    let mut formatted_fraction = format!("{}", active_fract);
+    formatted_fraction.truncate(2);
+    radio_panel.set_window(window_active, &format!("{}.{}", active_integer, formatted_fraction));
     radio_panel.set_window(window_standby, "67890");
     radio_panel.update_all_windows();
 
