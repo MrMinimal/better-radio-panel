@@ -685,10 +685,14 @@ fn display_nav_values(
     let standby_integer = frequency_state.standby_integer_part;
     let standby_fract = frequency_state.standby_fractional_part;
 
-    let mut formatted_fraction = format!("{}", active_fract);
-    formatted_fraction.truncate(2);
-    radio_panel.set_window(window_active, &format!("{}.{}", active_integer, formatted_fraction));
-    radio_panel.set_window(window_standby, "67890");
+    let mut active_fract = format!("{:03}", active_fract);
+    active_fract.truncate(2);
+    radio_panel.set_window(window_active, &format!("{}.{}", active_integer, active_fract));
+
+    let mut standby_fract = format!("{:03}", standby_fract);
+    standby_fract.truncate(2);
+    radio_panel.set_window(window_standby, &format!("{}.{}", standby_integer, standby_fract));
+
     radio_panel.update_all_windows();
 
     return true;
