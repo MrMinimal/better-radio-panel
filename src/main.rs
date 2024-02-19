@@ -7,13 +7,7 @@ use std::{
 };
 
 use radio_panel::{
-    constants::{
-        EVENT_ID_AP_ALT_VAR_SET_ENGLISH, EVENT_ID_AP_SPD_VAR_SET, EVENT_ID_AP_VS_VAR_SET_ENGLISH,
-        EVENT_ID_COM2_RADIO_SET_HZ, EVENT_ID_COM2_STBY_RADIO_SET_HZ, EVENT_ID_COM_RADIO_SET_HZ,
-        EVENT_ID_COM_STBY_RADIO_SET_HZ, EVENT_ID_HEADING_BUG_SET, EVENT_ID_NAV1_RADIO_SET_HZ,
-        EVENT_ID_NAV1_STBY_SET_HZ, EVENT_ID_NAV2_RADIO_SET_HZ, EVENT_ID_NAV2_STBY_SET_HZ,
-        EVENT_ID_XPNDR_SET,
-    },
+    constants::*,
     device::{InputState, RadioPanel},
     input_states::{ButtonState, ModeSelectorState, RotaryState},
 };
@@ -687,11 +681,17 @@ fn display_nav_values(
 
     let mut active_fract = format!("{:03}", active_fract);
     active_fract.truncate(2);
-    radio_panel.set_window(window_active, &format!("{}.{}", active_integer, active_fract));
+    radio_panel.set_window(
+        window_active,
+        &format!("{}.{}", active_integer, active_fract),
+    );
 
     let mut standby_fract = format!("{:03}", standby_fract);
     standby_fract.truncate(2);
-    radio_panel.set_window(window_standby, &format!("{}.{}", standby_integer, standby_fract));
+    radio_panel.set_window(
+        window_standby,
+        &format!("{}.{}", standby_integer, standby_fract),
+    );
 
     radio_panel.update_all_windows();
 
