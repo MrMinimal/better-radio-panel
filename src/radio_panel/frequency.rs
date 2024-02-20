@@ -21,7 +21,7 @@ pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
             );
         }
         _ => {
-            panic!("sorryyyy")
+            panic!("Can't format frequencies other than 2 or 3 digits")
         }
     }
 }
