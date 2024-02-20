@@ -2,7 +2,7 @@ use parse_int::parse;
 use radio_panel::{
     constants::*,
     device::{InputState, RadioPanel},
-    frequency::Frequency,
+    frequency::*,
     input_states::{ButtonState, ModeSelectorState, RotaryState},
     states::*,
     windows::*,
@@ -74,6 +74,10 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
+                    let active_formatted = format_frequency(state.com1_state.active_freq, 3);
+                    let standby_formatted = format_frequency(state.com1_state.standby_freq, 3);
+                    println!("active formatted: {}", active_formatted);
+                    println!("standby formatted: {}", standby_formatted);
                     connected_to_sim = display_values(
                         3,
                         &mut state.com1_state,
@@ -293,41 +297,41 @@ fn plane_default_state() -> PlaneState {
         com1_state: FrequencyState {
             standby_freq: Frequency {
                 integer: 118,
-                fractional: 000,
+                fraction: 000,
             },
             active_freq: Frequency {
                 integer: 118,
-                fractional: 000,
+                fraction: 000,
             },
         },
         com2_state: FrequencyState {
             standby_freq: Frequency {
                 integer: 118,
-                fractional: 000,
+                fraction: 000,
             },
             active_freq: Frequency {
                 integer: 118,
-                fractional: 000,
+                fraction: 000,
             },
         },
         nav1_state: FrequencyState {
             standby_freq: Frequency {
                 integer: 108,
-                fractional: 000,
+                fraction: 000,
             },
             active_freq: Frequency {
                 integer: 108,
-                fractional: 000,
+                fraction: 000,
             },
         },
         nav2_state: FrequencyState {
             standby_freq: Frequency {
                 integer: 108,
-                fractional: 000,
+                fraction: 000,
             },
             active_freq: Frequency {
                 integer: 108,
-                fractional: 000,
+                fraction: 000,
             },
         },
         adf_state: AdfState {
@@ -496,15 +500,14 @@ fn handle_com_frequency_input(
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    frequency_state.standby_freq.fractional += match inner_rotary {
+    frequency_state.standby_freq.fraction += match inner_rotary {
         RotaryState::Clockwise => 5,
         RotaryState::CounterClockwise => -5,
         RotaryState::None => 0,
     };
 
     frequency_state.standby_freq.integer = wrap(frequency_state.standby_freq.integer, 118, 137);
-    frequency_state.standby_freq.fractional =
-        wrap(frequency_state.standby_freq.fractional, 0, 1000);
+    frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
 }
 
 fn handle_nav_frequency_input(
@@ -522,15 +525,14 @@ fn handle_nav_frequency_input(
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    frequency_state.standby_freq.fractional += match inner_rotary {
+    frequency_state.standby_freq.fraction += match inner_rotary {
         RotaryState::Clockwise => 50,
         RotaryState::CounterClockwise => -50,
         RotaryState::None => 0,
     };
 
     frequency_state.standby_freq.integer = wrap(frequency_state.standby_freq.integer, 108, 118);
-    frequency_state.standby_freq.fractional =
-        wrap(frequency_state.standby_freq.fractional, 0, 1000);
+    frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
 }
 
 fn handle_autopilot_input(
@@ -607,9 +609,9 @@ fn display_values(
 ) -> bool {
     // More consise variable names
     let active_integer = frequency_state.active_freq.integer;
-    let active_fract = frequency_state.active_freq.fractional;
+    let active_fract = frequency_state.active_freq.fraction;
     let standby_integer = frequency_state.standby_freq.integer;
-    let standby_fract = frequency_state.standby_freq.fractional;
+    let standby_fract = frequency_state.standby_freq.fraction;
 
     // Format for FS2020
     let active_integer = format!("{:0>3}", active_integer);
@@ -647,9 +649,9 @@ fn display_nav_values(
 ) -> bool {
     // More consise variable names
     let active_integer = frequency_state.active_freq.integer;
-    let active_fract = frequency_state.active_freq.fractional;
+    let active_fract = frequency_state.active_freq.fraction;
     let standby_integer = frequency_state.standby_freq.integer;
-    let standby_fract = frequency_state.standby_freq.fractional;
+    let standby_fract = frequency_state.standby_freq.fraction;
 
     let mut active_fract = format!("{:03}", active_fract);
     active_fract.truncate(2);
