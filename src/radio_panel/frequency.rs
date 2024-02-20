@@ -4,6 +4,7 @@ pub struct Frequency {
     pub fraction: i16,
 }
 
+// Formats a given frequency to the 00.000 or 000.00 format
 pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
     match fractional_digits {
         2 => {
