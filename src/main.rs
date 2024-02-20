@@ -74,10 +74,15 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    let active_formatted = format_frequency(state.com1_state.active_freq, 3);
-                    let standby_formatted = format_frequency(state.com1_state.standby_freq, 3);
-                    println!("active formatted: {}", active_formatted);
-                    println!("standby formatted: {}", standby_formatted);
+                    radio_panel.set_window(
+                        Window::TopLeft,
+                        &format_frequency(state.com1_state.active_freq, 3),
+                    );
+                    radio_panel.set_window(
+                        Window::TopRight,
+                        &format_frequency(state.com1_state.standby_freq, 3),
+                    );
+                    radio_panel.update_all_windows();
                     connected_to_sim = display_values(
                         3,
                         &mut state.com1_state,
@@ -628,15 +633,6 @@ fn display_values(
     if !simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0) {
         return false;
     }
-
-    // Format for hardware
-    let active_integer = active_integer.to_string()[1..].to_string(); // truncate first digit because display can only display 5
-    let active_frequency = format!("{}.{}", active_integer, active_fract);
-    let standby_integer = standby_integer.to_string()[1..].to_string(); // truncate first digit because display can only display 5
-    let standby_frequency = format!("{}.{}", standby_integer, standby_fract);
-    radio_panel.set_window(window_active, &active_frequency);
-    radio_panel.set_window(window_standby, &standby_frequency);
-    radio_panel.update_all_windows();
 
     return true;
 }

@@ -18,7 +18,7 @@ pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
             return format!(
                 "{integer}.{fraction}",
                 integer = freq.integer.to_string()[1..].to_string(),
-                fraction = format!("{:03}", 0),
+                fraction = format!("{:03}", freq.fraction),
             );
         }
         _ => {
