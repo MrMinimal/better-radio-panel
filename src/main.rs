@@ -6,6 +6,7 @@ use radio_panel::{
     input_states::{ButtonState, ModeSelectorState, RotaryState},
     states::*,
     windows::*,
+    utility::*,
 };
 use simconnect::{self, SimConnector};
 use std::{
@@ -86,9 +87,6 @@ fn main() {
                     connected_to_sim = display_values(
                         3,
                         &mut state.com1_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        &mut radio_panel,
                         &simulator,
                         EVENT_ID_COM_RADIO_SET_HZ,
                         EVENT_ID_COM_STBY_RADIO_SET_HZ,
@@ -104,9 +102,6 @@ fn main() {
                     connected_to_sim = display_values(
                         3,
                         &mut state.com2_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        &mut radio_panel,
                         &simulator,
                         EVENT_ID_COM2_RADIO_SET_HZ,
                         EVENT_ID_COM2_STBY_RADIO_SET_HZ,
@@ -179,9 +174,6 @@ fn main() {
                     connected_to_sim = display_values(
                         3,
                         &mut state.com1_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        &mut radio_panel,
                         &simulator,
                         EVENT_ID_COM_RADIO_SET_HZ,
                         EVENT_ID_COM_STBY_RADIO_SET_HZ,
@@ -197,9 +189,6 @@ fn main() {
                     connected_to_sim = display_values(
                         3,
                         &mut state.com2_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        &mut radio_panel,
                         &simulator,
                         EVENT_ID_COM2_RADIO_SET_HZ,
                         EVENT_ID_COM2_STBY_RADIO_SET_HZ,
@@ -605,9 +594,6 @@ fn handle_autopilot_input(
 fn display_values(
     _fractional_digits: u8,
     frequency_state: &mut FrequencyState,
-    window_active: Window,
-    window_standby: Window,
-    radio_panel: &mut RadioPanel,
     simulator: &SimConnector,
     active_event_id: u32,
     standby_event_id: u32,
@@ -708,50 +694,4 @@ fn show_standby_screen(radio_panel: &mut RadioPanel) {
         radio_panel.set_window(window, "-----");
     }
     radio_panel.update_all_windows();
-}
-
-/// Make sure values stay within min and max
-/// Wraps around on both ends
-fn wrap<T: std::cmp::PartialOrd + std::ops::Sub<Output = T> + std::ops::Add<Output = T>>(
-    value: T,
-    min: T,
-    max: T,
-) -> T {
-    if value < min {
-        max - (min - value)
-    } else if value >= max {
-        min + (value - max)
-    } else {
-        value
-    }
-}
-
-#[cfg(test)]
-mod wrap_tests {
-    use super::*;
-
-    #[test]
-    fn test_in_range() {
-        assert_eq!(wrap(120, 110, 140), 120);
-    }
-
-    #[test]
-    fn test_on_min() {
-        assert_eq!(wrap(110, 110, 140), 110);
-    }
-
-    #[test]
-    fn test_on_max() {
-        assert_eq!(wrap(140, 110, 140), 110);
-    }
-
-    #[test]
-    fn test_above_max() {
-        assert_eq!(wrap(150, 110, 140), 120);
-    }
-
-    #[test]
-    fn test_below_min() {
-        assert_eq!(wrap(90, 110, 140), 120);
-    }
 }

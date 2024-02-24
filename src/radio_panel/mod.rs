@@ -5,3 +5,4 @@ pub mod hardware;
 pub mod input_states;
 pub mod states;
 pub mod windows;
+pub mod utility;

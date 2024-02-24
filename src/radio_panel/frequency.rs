@@ -27,6 +27,7 @@ pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
     }
 }
 
+#[cfg(test)]
 mod frequency_formatting_tests {
     use crate::{format_frequency, Frequency};
 
