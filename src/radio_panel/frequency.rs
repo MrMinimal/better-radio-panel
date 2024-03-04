@@ -52,10 +52,12 @@ mod frequency_formatting_tests {
         let freq3: Frequency = Frequency{integer: 108, fraction: 100};
         let freq4: Frequency = Frequency{integer: 108, fraction: 150};
         let freq5: Frequency = Frequency{integer: 108, fraction: 200};
+        let freq6: Frequency = Frequency{integer: 108, fraction: 205};
         assert_eq!(format_frequency(freq1, 3), "08.000");
         assert_eq!(format_frequency(freq2, 3), "08.050");
         assert_eq!(format_frequency(freq3, 3), "08.100");
         assert_eq!(format_frequency(freq4, 3), "08.150");
         assert_eq!(format_frequency(freq5, 3), "08.200");
+        assert_eq!(format_frequency(freq6, 3), "08.205");
     }
 }
