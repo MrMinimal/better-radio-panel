@@ -62,7 +62,6 @@ fn main() {
                     );
                     radio_panel.update_all_windows();
                     connected_to_sim = display_values(
-                        3,
                         &mut state.com1_state,
                         &simulator,
                         EVENT_ID_COM_RADIO_SET_HZ,
@@ -77,7 +76,6 @@ fn main() {
                         input.rotary_upper_inner,
                     );
                     connected_to_sim = display_values(
-                        3,
                         &mut state.com2_state,
                         &simulator,
                         EVENT_ID_COM2_RADIO_SET_HZ,
@@ -149,7 +147,6 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
-                        3,
                         &mut state.com1_state,
                         &simulator,
                         EVENT_ID_COM_RADIO_SET_HZ,
@@ -164,7 +161,6 @@ fn main() {
                         input.rotary_lower_inner,
                     );
                     connected_to_sim = display_values(
-                        3,
                         &mut state.com2_state,
                         &simulator,
                         EVENT_ID_COM2_RADIO_SET_HZ,
@@ -509,7 +505,6 @@ fn handle_autopilot_input(
 }
 
 fn display_values(
-    _fractional_digits: u8,
     frequency_state: &mut FrequencyState,
     simulator: &SimConnector,
     active_event_id: u32,
