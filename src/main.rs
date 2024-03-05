@@ -16,33 +16,10 @@ use std::{
 
 mod radio_panel;
 
-pub struct AutopilotState {
-    pub airspeed: i16,
-    pub heading: i16,
-    pub altitude: i32,
-    pub vertical_speed: i16,
-    selected_setting: AutopilotValue,
-}
-
-enum AutopilotValue {
-    Altitude,
-    VerticalSpeed,
-}
-
-struct PlaneState {
-    com1_state: FrequencyState,
-    com2_state: FrequencyState,
-    nav1_state: FrequencyState,
-    nav2_state: FrequencyState,
-    adf_state: AdfState,
-    dme_state: DmeState,
-    xpdr_state: XpdrState,
-    autopilot_state: AutopilotState,
-}
 
 fn main() {
     let mut radio_panel = RadioPanel::new();
-    let mut state = plane_default_state();
+    let mut state = instruments_default_state();
     let mut simulator = simconnect::SimConnector::new();
     let mut connected_to_sim = false;
 
@@ -286,66 +263,6 @@ fn setup_simulator_event_ids(simulator: &mut SimConnector) {
     simulator.map_client_event_to_sim_event(EVENT_ID_AP_SPD_VAR_SET, "AP_SPD_VAR_SET");
 }
 
-fn plane_default_state() -> PlaneState {
-    PlaneState {
-        com1_state: FrequencyState {
-            standby_freq: Frequency {
-                integer: 118,
-                fraction: 000,
-            },
-            active_freq: Frequency {
-                integer: 118,
-                fraction: 000,
-            },
-        },
-        com2_state: FrequencyState {
-            standby_freq: Frequency {
-                integer: 118,
-                fraction: 000,
-            },
-            active_freq: Frequency {
-                integer: 118,
-                fraction: 000,
-            },
-        },
-        nav1_state: FrequencyState {
-            standby_freq: Frequency {
-                integer: 108,
-                fraction: 000,
-            },
-            active_freq: Frequency {
-                integer: 108,
-                fraction: 000,
-            },
-        },
-        nav2_state: FrequencyState {
-            standby_freq: Frequency {
-                integer: 108,
-                fraction: 000,
-            },
-            active_freq: Frequency {
-                integer: 108,
-                fraction: 000,
-            },
-        },
-        adf_state: AdfState {
-            active_frequency: 123,
-            standby_frequency: 123,
-        },
-        dme_state: DmeState { distance: 0.0 },
-        xpdr_state: XpdrState {
-            code: [1, 0, 0, 0],
-            selected_digit: 0,
-        },
-        autopilot_state: AutopilotState {
-            airspeed: 0,
-            heading: 0,
-            altitude: 100, // Airbus A320's minimum setting is 100, might as well initiate as such
-            vertical_speed: 0,
-            selected_setting: AutopilotValue::Altitude,
-        },
-    }
-}
 
 fn show_connecting_animation(radio_panel: &mut RadioPanel) {
     radio_panel.clear_all_windows();
