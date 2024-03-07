@@ -146,7 +146,7 @@ fn handle_lower_panel(
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
-            *connected_to_sim = display_adf_values(
+            display_adf_values(
                 &mut state.adf_state,
                 Window::BottomLeft,
                 Window::BottomRight,
@@ -154,7 +154,7 @@ fn handle_lower_panel(
             );
         }
         ModeSelectorState::ModeSelectorDme => {
-            dme_logic(
+            display_dme_on_hardware(
                 radio_panel,
                 &state.dme_state,
                 &state.nav1_state,
@@ -260,7 +260,7 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
-            *connected_to_sim = display_adf_values(
+            display_adf_values(
                 &mut state.adf_state,
                 Window::TopLeft,
                 Window::TopRight,
@@ -268,7 +268,7 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorDme => {
-            dme_logic(
+            display_dme_on_hardware(
                 radio_panel,
                 &state.dme_state,
                 &state.nav1_state,
@@ -384,57 +384,7 @@ fn show_connecting_animation(radio_panel: &mut RadioPanel) {
     }
 }
 
-fn xpdr_logic(
-    input: InputState,
-    xpdr_state: &mut XpdrState,
-    window_active: Window,
-    window_standby: Window,
-    radio_panel: &mut RadioPanel,
-    simulator: &SimConnector,
-) {
-    if matches!(input.button_upper, ButtonState::Pressed) {
-        xpdr_state.selected_digit += 1;
-        xpdr_state.selected_digit =
-            wrap(xpdr_state.selected_digit.try_into().unwrap(), 0, 4) as usize;
-    }
-
-    xpdr_state.code[xpdr_state.selected_digit] += match input.rotary_upper_outer {
-        RotaryState::Clockwise => 1,
-        RotaryState::CounterClockwise => -1,
-        RotaryState::None => 0,
-    };
-    xpdr_state.code[xpdr_state.selected_digit] += match input.rotary_upper_inner {
-        RotaryState::Clockwise => 1,
-        RotaryState::CounterClockwise => -1,
-        RotaryState::None => 0,
-    };
-    xpdr_state.code[xpdr_state.selected_digit] =
-        wrap(xpdr_state.code[xpdr_state.selected_digit], 0, 8);
-
-    let code = xpdr_state.code.map(|d| d.to_string()).join("");
-    let hex = format!("0x{}", code);
-    let hex = parse::<u32>(&hex).unwrap();
-    let code = format!(" {}", code);
-    let code: String = code
-        .chars()
-        .enumerate()
-        .map(|(i, char)| {
-            if i == (xpdr_state.selected_digit + 1) {
-                format!("{}.", char) // if digit selected, add dot to it
-            } else {
-                char.to_string()
-            }
-        })
-        .collect();
-
-    simulator.transmit_client_event(1, 1008, hex, 5, 0);
-
-    radio_panel.set_window(window_active, "     ");
-    radio_panel.set_window(window_standby, &code);
-    radio_panel.update_all_windows();
-}
-
-fn dme_logic(
+fn display_dme_on_hardware(
     radio_panel: &mut RadioPanel,
     dme_state: &DmeState,
     nav1_state: &FrequencyState,
@@ -664,15 +614,13 @@ fn display_adf_values(
     window_active: Window,
     window_standby: Window,
     radio_panel: &mut RadioPanel,
-) -> bool {
+) {
     radio_panel.set_window(window_active, "     ");
     radio_panel.set_window(
         window_standby,
         &format!("{: >5}", adf_state.standby_frequency),
     );
     radio_panel.update_all_windows();
-
-    return true;
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
