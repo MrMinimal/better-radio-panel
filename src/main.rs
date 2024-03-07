@@ -5,8 +5,8 @@ use radio_panel::{
     frequency::*,
     input_states::{ButtonState, ModeSelectorState, RotaryState},
     states::*,
-    windows::*,
     utility::*,
+    windows::*,
 };
 use simconnect::{self, SimConnector};
 use std::{
@@ -15,7 +15,6 @@ use std::{
 };
 
 mod radio_panel;
-
 
 fn main() {
     let mut radio_panel = RadioPanel::new();
@@ -52,15 +51,13 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    radio_panel.set_window(
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.com1_state,
                         Window::TopLeft,
-                        &format_frequency(state.com1_state.active_freq, 3),
-                    );
-                    radio_panel.set_window(
                         Window::TopRight,
-                        &format_frequency(state.com1_state.standby_freq, 3),
+                        3,
                     );
-                    radio_panel.update_all_windows();
                     connected_to_sim = send_to_sim(
                         &mut state.com1_state,
                         &simulator,
@@ -75,7 +72,13 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    display_frequency_on_hardware(&mut radio_panel, &state.com2_state, Window::TopLeft, Window::TopRight, 3);
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.com2_state,
+                        Window::TopLeft,
+                        Window::TopRight,
+                        3,
+                    );
                     connected_to_sim = send_to_sim(
                         &mut state.com2_state,
                         &simulator,
@@ -238,7 +241,13 @@ fn main() {
     }
 }
 
-fn display_frequency_on_hardware(radio_panel: &mut RadioPanel, frequency_state: &FrequencyState, left_window: Window, right_window: Window, fractional_digits: u8) {
+fn display_frequency_on_hardware(
+    radio_panel: &mut RadioPanel,
+    frequency_state: &FrequencyState,
+    left_window: Window,
+    right_window: Window,
+    fractional_digits: u8,
+) {
     radio_panel.set_window(
         left_window,
         &format_frequency(frequency_state.active_freq, fractional_digits),
@@ -271,7 +280,6 @@ fn setup_simulator_event_ids(simulator: &mut SimConnector) {
         .map_client_event_to_sim_event(EVENT_ID_AP_VS_VAR_SET_ENGLISH, "AP_VS_VAR_SET_ENGLISH");
     simulator.map_client_event_to_sim_event(EVENT_ID_AP_SPD_VAR_SET, "AP_SPD_VAR_SET");
 }
-
 
 fn show_connecting_animation(radio_panel: &mut RadioPanel) {
     radio_panel.clear_all_windows();

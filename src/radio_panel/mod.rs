@@ -4,5 +4,5 @@ pub mod frequency;
 pub mod hardware;
 pub mod input_states;
 pub mod states;
-pub mod windows;
 pub mod utility;
+pub mod windows;

@@ -11,7 +11,10 @@ pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
             return format!(
                 "{integer}.{fraction}",
                 integer = freq.integer,
-                fraction = format!("{:03}", freq.fraction).chars().take(2).collect::<String>()
+                fraction = format!("{:03}", freq.fraction)
+                    .chars()
+                    .take(2)
+                    .collect::<String>()
             );
         }
         3 => {
@@ -33,11 +36,26 @@ mod frequency_formatting_tests {
 
     #[test]
     fn test_two_digits() {
-        let freq1: Frequency = Frequency{integer: 108, fraction: 0};
-        let freq2: Frequency = Frequency{integer: 108, fraction: 50};
-        let freq3: Frequency = Frequency{integer: 108, fraction: 100};
-        let freq4: Frequency = Frequency{integer: 108, fraction: 150};
-        let freq5: Frequency = Frequency{integer: 108, fraction: 200};
+        let freq1: Frequency = Frequency {
+            integer: 108,
+            fraction: 0,
+        };
+        let freq2: Frequency = Frequency {
+            integer: 108,
+            fraction: 50,
+        };
+        let freq3: Frequency = Frequency {
+            integer: 108,
+            fraction: 100,
+        };
+        let freq4: Frequency = Frequency {
+            integer: 108,
+            fraction: 150,
+        };
+        let freq5: Frequency = Frequency {
+            integer: 108,
+            fraction: 200,
+        };
         assert_eq!(format_frequency(freq1, 2), "108.00");
         assert_eq!(format_frequency(freq2, 2), "108.05");
         assert_eq!(format_frequency(freq3, 2), "108.10");
@@ -47,12 +65,30 @@ mod frequency_formatting_tests {
 
     #[test]
     fn test_three_digits() {
-        let freq1: Frequency = Frequency{integer: 108, fraction: 0};
-        let freq2: Frequency = Frequency{integer: 108, fraction: 50};
-        let freq3: Frequency = Frequency{integer: 108, fraction: 100};
-        let freq4: Frequency = Frequency{integer: 108, fraction: 150};
-        let freq5: Frequency = Frequency{integer: 108, fraction: 200};
-        let freq6: Frequency = Frequency{integer: 108, fraction: 205};
+        let freq1: Frequency = Frequency {
+            integer: 108,
+            fraction: 0,
+        };
+        let freq2: Frequency = Frequency {
+            integer: 108,
+            fraction: 50,
+        };
+        let freq3: Frequency = Frequency {
+            integer: 108,
+            fraction: 100,
+        };
+        let freq4: Frequency = Frequency {
+            integer: 108,
+            fraction: 150,
+        };
+        let freq5: Frequency = Frequency {
+            integer: 108,
+            fraction: 200,
+        };
+        let freq6: Frequency = Frequency {
+            integer: 108,
+            fraction: 205,
+        };
         assert_eq!(format_frequency(freq1, 3), "08.000");
         assert_eq!(format_frequency(freq2, 3), "08.050");
         assert_eq!(format_frequency(freq3, 3), "08.100");
