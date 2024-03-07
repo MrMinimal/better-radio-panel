@@ -31,7 +31,7 @@ fn main() {
             };
 
             if input.mode_selector_upper == input.mode_selector_lower {
-                handle_autopilot_input(
+                apply_autopilot_input(
                     &mut state.autopilot_state,
                     input.rotary_upper_outer,
                     input.rotary_upper_inner,
@@ -63,7 +63,7 @@ fn main() {
 fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
     match input.mode_selector_lower {
         ModeSelectorState::ModeSelectorCom1 => {
-            handle_com_input(
+            apply_com_input(
                 &mut state.com1_state,
                 input.button_lower,
                 input.rotary_lower_outer,
@@ -84,7 +84,7 @@ fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorCom2 => {
-            handle_com_input(
+            apply_com_input(
                 &mut state.com2_state,
                 input.button_lower,
                 input.rotary_lower_outer,
@@ -106,7 +106,7 @@ fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorNav1 => {
-            handle_nav_input(
+            apply_nav_input(
                 &mut state.nav1_state,
                 input.button_lower,
                 input.rotary_lower_outer,
@@ -121,7 +121,7 @@ fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorNav2 => {
-            handle_nav_input(
+            apply_nav_input(
                 &mut state.nav2_state,
                 input.button_lower,
                 input.rotary_lower_outer,
@@ -167,7 +167,7 @@ fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_pan
 fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
     match input.mode_selector_upper {
         ModeSelectorState::ModeSelectorCom1 => {
-            handle_com_input(
+            apply_com_input(
                 &mut state.com1_state,
                 input.button_upper,
                 input.rotary_upper_outer,
@@ -188,7 +188,7 @@ fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorCom2 => {
-            handle_com_input(
+            apply_com_input(
                 &mut state.com2_state,
                 input.button_upper,
                 input.rotary_upper_outer,
@@ -209,7 +209,7 @@ fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorNav1 => {
-            handle_nav_input(
+            apply_nav_input(
                 &mut state.nav1_state,
                 input.button_upper,
                 input.rotary_upper_outer,
@@ -224,7 +224,7 @@ fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_pan
             );
         }
         ModeSelectorState::ModeSelectorNav2 => {
-            handle_nav_input(
+            apply_nav_input(
                 &mut state.nav2_state,
                 input.button_upper,
                 input.rotary_upper_outer,
@@ -439,7 +439,7 @@ fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel
     radio_panel.update_all_windows();
 }
 
-fn handle_com_input(
+fn apply_com_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
@@ -464,7 +464,7 @@ fn handle_com_input(
     frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
 }
 
-fn handle_nav_input(
+fn apply_nav_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
@@ -489,7 +489,7 @@ fn handle_nav_input(
     frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
 }
 
-fn handle_autopilot_input(
+fn apply_autopilot_input(
     autopilot_state: &mut AutopilotState,
     outer_rotary_upper: RotaryState,
     inner_rotary_upper: RotaryState,
