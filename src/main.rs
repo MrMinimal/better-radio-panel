@@ -163,13 +163,17 @@ fn handle_lower_panel(
             );
         }
         ModeSelectorState::ModeSelectorXpdr => {
-            xpdr_logic(
-                input,
+            apply_xpdr_input(
                 &mut state.xpdr_state,
+                input.button_lower,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+            );
+            display_xpdr_on_hardware(
+                radio_panel,
+                &state.xpdr_state,
                 Window::BottomLeft,
                 Window::BottomRight,
-                radio_panel,
-                simulator,
             );
         }
     }
@@ -273,13 +277,17 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorXpdr => {
-            xpdr_logic(
-                input,
+            apply_xpdr_input(
                 &mut state.xpdr_state,
+                input.button_upper,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+            );
+            display_xpdr_on_hardware(
+                radio_panel,
+                &state.xpdr_state,
                 Window::TopLeft,
                 Window::TopRight,
-                radio_panel,
-                simulator,
             );
         }
     }
@@ -300,6 +308,31 @@ fn display_frequency_on_hardware(
         right_window,
         &format_frequency(frequency_state.standby_freq, fractional_digits),
     );
+    radio_panel.update_all_windows();
+}
+
+fn display_xpdr_on_hardware(
+    radio_panel: &mut RadioPanel,
+    state: &XpdrState,
+    left_window: Window,
+    right_window: Window,
+) {
+    let code = state.code.map(|d| d.to_string()).join("");
+    let code = format!(" {}", code);
+    let code: String = code
+        .chars()
+        .enumerate()
+        .map(|(i, char)| {
+            if i == (state.selected_digit + 1) {
+                format!("{}.", char) // if digit selected, add dot to it
+            } else {
+                char.to_string()
+            }
+        })
+        .collect();
+
+    radio_panel.set_window(left_window, "     ");
+    radio_panel.set_window(right_window, &code);
     radio_panel.update_all_windows();
 }
 
@@ -506,6 +539,31 @@ fn apply_nav_input(
 
     frequency_state.standby_freq.integer = wrap(frequency_state.standby_freq.integer, 108, 118);
     frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
+}
+
+fn apply_xpdr_input(
+    state: &mut XpdrState,
+    swap_button: ButtonState,
+    outer_rotary: RotaryState,
+    inner_rotary: RotaryState,
+) {
+    if matches!(swap_button, ButtonState::Pressed) {
+        state.selected_digit += 1;
+        state.selected_digit =
+            wrap(state.selected_digit.try_into().unwrap(), 0, 4) as usize;
+    }
+    state.code[state.selected_digit] += match outer_rotary {
+        RotaryState::Clockwise => 1,
+        RotaryState::CounterClockwise => -1,
+        RotaryState::None => 0,
+    };
+    state.code[state.selected_digit] += match inner_rotary {
+        RotaryState::Clockwise => 1,
+        RotaryState::CounterClockwise => -1,
+        RotaryState::None => 0,
+    };
+    state.code[state.selected_digit] =
+        wrap(state.code[state.selected_digit], 0, 8);
 }
 
 fn apply_autopilot_input(
