@@ -2,6 +2,14 @@ use super::constants::{
     BITMASK_HIDE_DECIMAL_POINT, BITMASK_SHOW_DECIMAL_POINT, DEVICE_SEVEN_SEGMENT_COUNT,
 };
 
+#[derive(Copy, Clone)]
+pub enum Window {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+}
+
 #[derive(Copy, Clone, Debug)]
 /// One of 4 windows on the Radio Panel
 /// Each window has 5, 7-segement displays

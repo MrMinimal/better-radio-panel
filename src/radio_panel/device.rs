@@ -2,11 +2,9 @@ use core::panic;
 use hidapi::{HidApi, HidDevice};
 use std::process;
 
-use crate::Window;
-
 use super::{
     constants::*,
-    hardware::{RadioPanelWindow, SevenSegmentDisplay},
+    hardware::*,
     input_states::{ButtonState, ModeSelectorState, RotaryState},
 };
 

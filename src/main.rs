@@ -1,6 +1,6 @@
 use parse_int::parse;
 use radio_panel::{
-    constants::*, device::*, frequency::*, input_states::*, states::*, utility::*, windows::*,
+    constants::*, device::*, frequency::*, input_states::*, states::*, utility::*, hardware::*,
 };
 use simconnect::{self, SimConnector};
 use std::{
