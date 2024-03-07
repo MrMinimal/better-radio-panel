@@ -43,208 +43,8 @@ fn main() {
                 continue;
             }
 
-            match input.mode_selector_upper {
-                ModeSelectorState::ModeSelectorCom1 => {
-                    handle_com_input(
-                        &mut state.com1_state,
-                        input.button_upper,
-                        input.rotary_upper_outer,
-                        input.rotary_upper_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.com1_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        3,
-                    );
-                    connected_to_sim = send_to_sim(
-                        &mut state.com1_state,
-                        &simulator,
-                        EVENT_ID_COM_RADIO_SET_HZ,
-                        EVENT_ID_COM_STBY_RADIO_SET_HZ,
-                    );
-                }
-                ModeSelectorState::ModeSelectorCom2 => {
-                    handle_com_input(
-                        &mut state.com2_state,
-                        input.button_upper,
-                        input.rotary_upper_outer,
-                        input.rotary_upper_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.com2_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        3,
-                    );
-                    connected_to_sim = send_to_sim(
-                        &mut state.com2_state,
-                        &simulator,
-                        EVENT_ID_COM2_RADIO_SET_HZ,
-                        EVENT_ID_COM2_STBY_RADIO_SET_HZ,
-                    );
-                }
-                ModeSelectorState::ModeSelectorNav1 => {
-                    handle_nav_input(
-                        &mut state.nav1_state,
-                        input.button_upper,
-                        input.rotary_upper_outer,
-                        input.rotary_upper_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.nav1_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        2,
-                    );
-                }
-                ModeSelectorState::ModeSelectorNav2 => {
-                    handle_nav_input(
-                        &mut state.nav2_state,
-                        input.button_upper,
-                        input.rotary_upper_outer,
-                        input.rotary_upper_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.nav2_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        2,
-                    );
-                }
-                ModeSelectorState::ModeSelectorAdf => {
-                    connected_to_sim = display_adf_values(
-                        &mut state.adf_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        &mut radio_panel,
-                    );
-                }
-                ModeSelectorState::ModeSelectorDme => {
-                    dme_logic(
-                        &mut radio_panel,
-                        &mut state.dme_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                    );
-                }
-                ModeSelectorState::ModeSelectorXpdr => {
-                    xpdr_logic(
-                        input,
-                        &mut state.xpdr_state,
-                        Window::TopLeft,
-                        Window::TopRight,
-                        &mut radio_panel,
-                        &simulator,
-                    );
-                }
-            }
-
-            match input.mode_selector_lower {
-                ModeSelectorState::ModeSelectorCom1 => {
-                    handle_com_input(
-                        &mut state.com1_state,
-                        input.button_lower,
-                        input.rotary_lower_outer,
-                        input.rotary_lower_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.com1_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        3,
-                    );
-                    connected_to_sim = send_to_sim(
-                        &mut state.com1_state,
-                        &simulator,
-                        EVENT_ID_COM_RADIO_SET_HZ,
-                        EVENT_ID_COM_STBY_RADIO_SET_HZ,
-                    );
-                }
-                ModeSelectorState::ModeSelectorCom2 => {
-                    handle_com_input(
-                        &mut state.com2_state,
-                        input.button_lower,
-                        input.rotary_lower_outer,
-                        input.rotary_lower_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.com2_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        3,
-                    );
-
-                    connected_to_sim = send_to_sim(
-                        &mut state.com2_state,
-                        &simulator,
-                        EVENT_ID_COM2_RADIO_SET_HZ,
-                        EVENT_ID_COM2_STBY_RADIO_SET_HZ,
-                    );
-                }
-                ModeSelectorState::ModeSelectorNav1 => {
-                    handle_nav_input(
-                        &mut state.nav1_state,
-                        input.button_lower,
-                        input.rotary_lower_outer,
-                        input.rotary_lower_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.nav1_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        2,
-                    );
-                }
-                ModeSelectorState::ModeSelectorNav2 => {
-                    handle_nav_input(
-                        &mut state.nav2_state,
-                        input.button_lower,
-                        input.rotary_lower_outer,
-                        input.rotary_lower_inner,
-                    );
-                    display_frequency_on_hardware(
-                        &mut radio_panel,
-                        &state.nav2_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        2,
-                    );
-                }
-                ModeSelectorState::ModeSelectorAdf => {
-                    connected_to_sim = display_adf_values(
-                        &mut state.adf_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        &mut radio_panel,
-                    );
-                }
-                ModeSelectorState::ModeSelectorDme => {
-                    dme_logic(
-                        &mut radio_panel,
-                        &state.dme_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                    );
-                }
-                ModeSelectorState::ModeSelectorXpdr => {
-                    xpdr_logic(
-                        input,
-                        &mut state.xpdr_state,
-                        Window::BottomLeft,
-                        Window::BottomRight,
-                        &mut radio_panel,
-                        &simulator,
-                    );
-                }
-            }
+            handle_upper_panel(input, &mut state, &mut radio_panel, &mut connected_to_sim, &simulator);
+            handle_lower_panel(input, &mut state, &mut radio_panel, &mut connected_to_sim, &simulator);
         } else {
             loop {
                 if simulator.connect("BetterRadioPanel") {
@@ -256,6 +56,213 @@ fn main() {
                     show_connecting_animation(&mut radio_panel)
                 }
             }
+        }
+    }
+}
+
+fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
+    match input.mode_selector_lower {
+        ModeSelectorState::ModeSelectorCom1 => {
+            handle_com_input(
+                &mut state.com1_state,
+                input.button_lower,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.com1_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                3,
+            );
+            *connected_to_sim = send_to_sim(
+                &mut state.com1_state,
+                simulator,
+                EVENT_ID_COM_RADIO_SET_HZ,
+                EVENT_ID_COM_STBY_RADIO_SET_HZ,
+            );
+        }
+        ModeSelectorState::ModeSelectorCom2 => {
+            handle_com_input(
+                &mut state.com2_state,
+                input.button_lower,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.com2_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                3,
+            );
+
+            *connected_to_sim = send_to_sim(
+                &mut state.com2_state,
+                simulator,
+                EVENT_ID_COM2_RADIO_SET_HZ,
+                EVENT_ID_COM2_STBY_RADIO_SET_HZ,
+            );
+        }
+        ModeSelectorState::ModeSelectorNav1 => {
+            handle_nav_input(
+                &mut state.nav1_state,
+                input.button_lower,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.nav1_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                2,
+            );
+        }
+        ModeSelectorState::ModeSelectorNav2 => {
+            handle_nav_input(
+                &mut state.nav2_state,
+                input.button_lower,
+                input.rotary_lower_outer,
+                input.rotary_lower_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.nav2_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                2,
+            );
+        }
+        ModeSelectorState::ModeSelectorAdf => {
+            *connected_to_sim = display_adf_values(
+                &mut state.adf_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                radio_panel,
+            );
+        }
+        ModeSelectorState::ModeSelectorDme => {
+            dme_logic(
+                radio_panel,
+                &state.dme_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+            );
+        }
+        ModeSelectorState::ModeSelectorXpdr => {
+            xpdr_logic(
+                input,
+                &mut state.xpdr_state,
+                Window::BottomLeft,
+                Window::BottomRight,
+                radio_panel,
+                simulator,
+            );
+        }
+    }
+}
+
+fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
+    match input.mode_selector_upper {
+        ModeSelectorState::ModeSelectorCom1 => {
+            handle_com_input(
+                &mut state.com1_state,
+                input.button_upper,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.com1_state,
+                Window::TopLeft,
+                Window::TopRight,
+                3,
+            );
+            *connected_to_sim = send_to_sim(
+                &mut state.com1_state,
+                simulator,
+                EVENT_ID_COM_RADIO_SET_HZ,
+                EVENT_ID_COM_STBY_RADIO_SET_HZ,
+            );
+        }
+        ModeSelectorState::ModeSelectorCom2 => {
+            handle_com_input(
+                &mut state.com2_state,
+                input.button_upper,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.com2_state,
+                Window::TopLeft,
+                Window::TopRight,
+                3,
+            );
+            *connected_to_sim = send_to_sim(
+                &mut state.com2_state,
+                simulator,
+                EVENT_ID_COM2_RADIO_SET_HZ,
+                EVENT_ID_COM2_STBY_RADIO_SET_HZ,
+            );
+        }
+        ModeSelectorState::ModeSelectorNav1 => {
+            handle_nav_input(
+                &mut state.nav1_state,
+                input.button_upper,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.nav1_state,
+                Window::TopLeft,
+                Window::TopRight,
+                2,
+            );
+        }
+        ModeSelectorState::ModeSelectorNav2 => {
+            handle_nav_input(
+                &mut state.nav2_state,
+                input.button_upper,
+                input.rotary_upper_outer,
+                input.rotary_upper_inner,
+            );
+            display_frequency_on_hardware(
+                radio_panel,
+                &state.nav2_state,
+                Window::TopLeft,
+                Window::TopRight,
+                2,
+            );
+        }
+        ModeSelectorState::ModeSelectorAdf => {
+            *connected_to_sim = display_adf_values(
+                &mut state.adf_state,
+                Window::TopLeft,
+                Window::TopRight,
+                radio_panel,
+            );
+        }
+        ModeSelectorState::ModeSelectorDme => {
+            dme_logic(
+                radio_panel,
+                &mut state.dme_state,
+                Window::TopLeft,
+                Window::TopRight,
+            );
+        }
+        ModeSelectorState::ModeSelectorXpdr => {
+            xpdr_logic(
+                input,
+                &mut state.xpdr_state,
+                Window::TopLeft,
+                Window::TopRight,
+                radio_panel,
+                simulator,
+            );
         }
     }
 }
