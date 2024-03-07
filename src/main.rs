@@ -261,7 +261,7 @@ fn handle_upper_panel(
         }
         ModeSelectorState::ModeSelectorAdf => {
             display_adf_values(
-                &mut state.adf_state,
+                &state.adf_state,
                 Window::TopLeft,
                 Window::TopRight,
                 radio_panel,
@@ -499,8 +499,7 @@ fn apply_xpdr_input(
 ) {
     if matches!(swap_button, ButtonState::Pressed) {
         state.selected_digit += 1;
-        state.selected_digit =
-            wrap(state.selected_digit.try_into().unwrap(), 0, 4) as usize;
+        state.selected_digit = wrap(state.selected_digit.try_into().unwrap(), 0, 4) as usize;
     }
     state.code[state.selected_digit] += match outer_rotary {
         RotaryState::Clockwise => 1,
@@ -512,8 +511,7 @@ fn apply_xpdr_input(
         RotaryState::CounterClockwise => -1,
         RotaryState::None => 0,
     };
-    state.code[state.selected_digit] =
-        wrap(state.code[state.selected_digit], 0, 8);
+    state.code[state.selected_digit] = wrap(state.code[state.selected_digit], 0, 8);
 }
 
 fn apply_autopilot_input(
@@ -606,7 +604,7 @@ fn send_to_sim(
         return false;
     }
 
-    return true;
+    true
 }
 
 fn display_adf_values(
@@ -624,9 +622,7 @@ fn display_adf_values(
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
-    let previous_active_freq = frequency_state.active_freq;
-    frequency_state.active_freq = frequency_state.standby_freq;
-    frequency_state.standby_freq = previous_active_freq;
+    std::mem::swap(&mut frequency_state.active_freq, &mut frequency_state.standby_freq)
 }
 
 /// Show only dashes to indicate no data recieved from sim yet

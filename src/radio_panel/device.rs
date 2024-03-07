@@ -131,7 +131,7 @@ impl RadioPanel {
             BITMASK_MODE_SELECTOR_LOWER_XPDR,
         );
 
-        return Some(input_state);
+        Some(input_state)
     }
 
     /// Show values in window, previous values are cleared
