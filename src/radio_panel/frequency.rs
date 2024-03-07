@@ -20,9 +20,7 @@ pub fn format_frequency(freq: Frequency, fractional_digits: u8) -> String {
         3 => {
             let integer = freq.integer.to_string()[1..].to_string();
             let fraction = format!("{:03}", freq.fraction);
-            format!(
-                "{integer}.{fraction}",
-            )
+            format!("{integer}.{fraction}",)
         }
         _ => {
             panic!("Can't format frequencies other than 2 or 3 digits")

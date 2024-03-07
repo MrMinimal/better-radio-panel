@@ -622,7 +622,10 @@ fn display_adf_values(
 }
 
 fn swap_frequencies(frequency_state: &mut FrequencyState) {
-    std::mem::swap(&mut frequency_state.active_freq, &mut frequency_state.standby_freq)
+    std::mem::swap(
+        &mut frequency_state.active_freq,
+        &mut frequency_state.standby_freq,
+    )
 }
 
 /// Show only dashes to indicate no data recieved from sim yet

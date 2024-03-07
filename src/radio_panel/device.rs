@@ -112,27 +112,27 @@ impl RadioPanel {
         input_state.mode_selector_upper = parse_mode_selector_state(
             input_buffer,
             ModeSelectorBitmaps {
-            com1: BITMASK_MODE_SELECTOR_UPPER_COM1,
-            com2: BITMASK_MODE_SELECTOR_UPPER_COM2,
-            nav1: BITMASK_MODE_SELECTOR_UPPER_NAV1,
-            nav2: BITMASK_MODE_SELECTOR_UPPER_NAV2,
-            adf: BITMASK_MODE_SELECTOR_UPPER_ADF,
-            dme: BITMASK_MODE_SELECTOR_UPPER_DME,
-            xpdr: BITMASK_MODE_SELECTOR_UPPER_XPDR,
-            }
+                com1: BITMASK_MODE_SELECTOR_UPPER_COM1,
+                com2: BITMASK_MODE_SELECTOR_UPPER_COM2,
+                nav1: BITMASK_MODE_SELECTOR_UPPER_NAV1,
+                nav2: BITMASK_MODE_SELECTOR_UPPER_NAV2,
+                adf: BITMASK_MODE_SELECTOR_UPPER_ADF,
+                dme: BITMASK_MODE_SELECTOR_UPPER_DME,
+                xpdr: BITMASK_MODE_SELECTOR_UPPER_XPDR,
+            },
         );
 
         input_state.mode_selector_lower = parse_mode_selector_state(
             input_buffer,
             ModeSelectorBitmaps {
-            com1: BITMASK_MODE_SELECTOR_LOWER_COM1,
-            com2: BITMASK_MODE_SELECTOR_LOWER_COM2,
-            nav1: BITMASK_MODE_SELECTOR_LOWER_NAV1,
-            nav2: BITMASK_MODE_SELECTOR_LOWER_NAV2,
-            adf: BITMASK_MODE_SELECTOR_LOWER_ADF,
-            dme: BITMASK_MODE_SELECTOR_LOWER_DME,
-            xpdr: BITMASK_MODE_SELECTOR_LOWER_XPDR,
-            }
+                com1: BITMASK_MODE_SELECTOR_LOWER_COM1,
+                com2: BITMASK_MODE_SELECTOR_LOWER_COM2,
+                nav1: BITMASK_MODE_SELECTOR_LOWER_NAV1,
+                nav2: BITMASK_MODE_SELECTOR_LOWER_NAV2,
+                adf: BITMASK_MODE_SELECTOR_LOWER_ADF,
+                dme: BITMASK_MODE_SELECTOR_LOWER_DME,
+                xpdr: BITMASK_MODE_SELECTOR_LOWER_XPDR,
+            },
         );
 
         Some(input_state)
@@ -204,10 +204,7 @@ impl RadioPanel {
 }
 
 /// Returns what state is a mode selector is in
-fn parse_mode_selector_state(
-    input_buffer: u32,
-    bitmaps: ModeSelectorBitmaps,
-) -> ModeSelectorState {
+fn parse_mode_selector_state(input_buffer: u32, bitmaps: ModeSelectorBitmaps) -> ModeSelectorState {
     if bitmask_applies(input_buffer, bitmaps.com1) {
         ModeSelectorState::ModeSelectorCom1
     } else if bitmask_applies(input_buffer, bitmaps.com2) {
