@@ -2,6 +2,30 @@ use super::constants::{
     BITMASK_HIDE_DECIMAL_POINT, BITMASK_SHOW_DECIMAL_POINT, DEVICE_SEVEN_SEGMENT_COUNT,
 };
 
+#[derive(Copy, Clone, Debug)]
+pub enum ButtonState {
+    Pressed,
+    Released,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum RotaryState {
+    None,
+    Clockwise,
+    CounterClockwise,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum ModeSelectorState {
+    ModeSelectorCom1,
+    ModeSelectorCom2,
+    ModeSelectorNav1,
+    ModeSelectorNav2,
+    ModeSelectorAdf,
+    ModeSelectorDme,
+    ModeSelectorXpdr,
+}
+
 #[derive(Copy, Clone)]
 pub enum Window {
     TopLeft,

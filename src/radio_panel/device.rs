@@ -5,7 +5,6 @@ use std::process;
 use super::{
     constants::*,
     hardware::*,
-    input_states::{ButtonState, ModeSelectorState, RotaryState},
 };
 
 const VENDOR_ID: u16 = 0x06a3; // Saitek
