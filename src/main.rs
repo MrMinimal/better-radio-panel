@@ -1,7 +1,5 @@
 use parse_int::parse;
-use radio_panel::{
-    constants::*, device::*, frequency::*, states::*, utility::*, hardware::*,
-};
+use radio_panel::{constants::*, device::*, frequency::*, hardware::*, states::*, utility::*};
 use simconnect::{self, SimConnector};
 use std::{
     thread,
@@ -159,6 +157,7 @@ fn handle_lower_panel(
             dme_logic(
                 radio_panel,
                 &state.dme_state,
+                &state.nav1_state,
                 Window::BottomLeft,
                 Window::BottomRight,
             );
@@ -267,7 +266,8 @@ fn handle_upper_panel(
         ModeSelectorState::ModeSelectorDme => {
             dme_logic(
                 radio_panel,
-                &mut state.dme_state,
+                &state.dme_state,
+                &state.nav1_state,
                 Window::TopLeft,
                 Window::TopRight,
             );
@@ -404,11 +404,12 @@ fn xpdr_logic(
 fn dme_logic(
     radio_panel: &mut RadioPanel,
     dme_state: &DmeState,
+    nav1_state: &FrequencyState,
     window_active: Window,
     window_standby: Window,
 ) {
     let formatted_distance = format!("   {:.1}", dme_state.distance);
-    radio_panel.set_window(window_active, "     ");
+    radio_panel.set_window(window_active, &format_frequency(nav1_state.active_freq, 2));
     radio_panel.set_window(window_standby, &formatted_distance);
     radio_panel.update_all_windows();
 }

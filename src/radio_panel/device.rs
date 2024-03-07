@@ -2,10 +2,7 @@ use core::panic;
 use hidapi::{HidApi, HidDevice};
 use std::process;
 
-use super::{
-    constants::*,
-    hardware::*,
-};
+use super::{constants::*, hardware::*};
 
 const VENDOR_ID: u16 = 0x06a3; // Saitek
 const PRODUCT_ID: u16 = 0x0d05; // Radio Panel
