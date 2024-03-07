@@ -26,6 +26,16 @@ pub enum ModeSelectorState {
     ModeSelectorXpdr,
 }
 
+pub struct ModeSelectorBitmaps {
+    pub com1: u32,
+    pub com2: u32,
+    pub nav1: u32,
+    pub nav2: u32,
+    pub adf: u32,
+    pub dme: u32,
+    pub xpdr: u32,
+}
+
 #[derive(Copy, Clone)]
 pub enum Window {
     TopLeft,
