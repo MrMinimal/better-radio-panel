@@ -152,6 +152,13 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.com1_state,
+                        Window::BottomLeft,
+                        Window::BottomRight,
+                        3,
+                    );
                     connected_to_sim = send_to_sim(
                         &mut state.com1_state,
                         &simulator,
@@ -166,6 +173,14 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.com2_state,
+                        Window::BottomLeft,
+                        Window::BottomRight,
+                        3,
+                    );
+
                     connected_to_sim = send_to_sim(
                         &mut state.com2_state,
                         &simulator,
