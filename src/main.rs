@@ -93,11 +93,12 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    connected_to_sim = display_nav_values(
-                        &mut state.nav1_state,
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.nav1_state,
                         Window::TopLeft,
                         Window::TopRight,
-                        &mut radio_panel,
+                        2,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -107,11 +108,12 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    connected_to_sim = display_nav_values(
-                        &mut state.nav2_state,
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.nav2_state,
                         Window::TopLeft,
                         Window::TopRight,
-                        &mut radio_panel,
+                        2,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
@@ -178,11 +180,12 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
-                    connected_to_sim = display_nav_values(
-                        &mut state.nav1_state,
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.nav1_state,
                         Window::BottomLeft,
                         Window::BottomRight,
-                        &mut radio_panel,
+                        2,
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
@@ -192,11 +195,12 @@ fn main() {
                         input.rotary_lower_outer,
                         input.rotary_lower_inner,
                     );
-                    connected_to_sim = display_nav_values(
-                        &mut state.nav2_state,
+                    display_frequency_on_hardware(
+                        &mut radio_panel,
+                        &state.nav2_state,
                         Window::BottomLeft,
                         Window::BottomRight,
-                        &mut radio_panel,
+                        2,
                     );
                 }
                 ModeSelectorState::ModeSelectorAdf => {
@@ -552,37 +556,6 @@ fn send_to_sim(
     if !simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0) {
         return false;
     }
-
-    return true;
-}
-
-fn display_nav_values(
-    frequency_state: &mut FrequencyState,
-    window_active: Window,
-    window_standby: Window,
-    radio_panel: &mut RadioPanel,
-) -> bool {
-    // More consise variable names
-    let active_integer = frequency_state.active_freq.integer;
-    let active_fract = frequency_state.active_freq.fraction;
-    let standby_integer = frequency_state.standby_freq.integer;
-    let standby_fract = frequency_state.standby_freq.fraction;
-
-    let mut active_fract = format!("{:03}", active_fract);
-    active_fract.truncate(2);
-    radio_panel.set_window(
-        window_active,
-        &format!("{}.{}", active_integer, active_fract),
-    );
-
-    let mut standby_fract = format!("{:03}", standby_fract);
-    standby_fract.truncate(2);
-    radio_panel.set_window(
-        window_standby,
-        &format!("{}.{}", standby_integer, standby_fract),
-    );
-
-    radio_panel.update_all_windows();
 
     return true;
 }
