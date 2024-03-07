@@ -75,7 +75,7 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
-                    display_on_hardware(&mut radio_panel, &state);
+                    display_frequency_on_hardware(&mut radio_panel, &state.com2_state, Window::TopLeft, Window::TopRight, 3);
                     connected_to_sim = send_to_sim(
                         &mut state.com2_state,
                         &simulator,
@@ -238,14 +238,14 @@ fn main() {
     }
 }
 
-fn display_on_hardware(radio_panel: &mut RadioPanel, state: &InstrumentStates) {
+fn display_frequency_on_hardware(radio_panel: &mut RadioPanel, frequency_state: &FrequencyState, left_window: Window, right_window: Window, fractional_digits: u8) {
     radio_panel.set_window(
-        Window::TopLeft,
-        &format_frequency(state.com2_state.active_freq, 3),
+        left_window,
+        &format_frequency(frequency_state.active_freq, fractional_digits),
     );
     radio_panel.set_window(
-        Window::TopRight,
-        &format_frequency(state.com2_state.standby_freq, 3),
+        right_window,
+        &format_frequency(frequency_state.standby_freq, fractional_digits),
     );
     radio_panel.update_all_windows();
 }
