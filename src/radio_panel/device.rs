@@ -87,17 +87,7 @@ impl RadioPanel {
             return None;
         }
 
-        let mut input_state = InputState {
-            mode_selector_upper: ModeSelectorState::ModeSelectorCom1,
-            mode_selector_lower: ModeSelectorState::ModeSelectorCom1,
-            rotary_upper_inner: RotaryState::None,
-            rotary_upper_outer: RotaryState::None,
-            rotary_lower_inner: RotaryState::None,
-            rotary_lower_outer: RotaryState::None,
-            button_upper: ButtonState::Released,
-            button_lower: ButtonState::Released,
-        };
-
+        let mut input_state = InputState::new();
         input_state.button_upper = parse_button_state(input_buffer, BITMASK_BUTTON_UPPER_PRESSED);
         input_state.button_lower = parse_button_state(input_buffer, BITMASK_BUTTON_LOWER_PRESSED);
 
