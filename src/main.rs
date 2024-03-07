@@ -75,6 +75,7 @@ fn main() {
                         input.rotary_upper_outer,
                         input.rotary_upper_inner,
                     );
+                    display_on_hardware(&mut radio_panel, &state);
                     connected_to_sim = send_to_sim(
                         &mut state.com2_state,
                         &simulator,
@@ -235,6 +236,18 @@ fn main() {
             }
         }
     }
+}
+
+fn display_on_hardware(radio_panel: &mut RadioPanel, state: &InstrumentStates) {
+    radio_panel.set_window(
+        Window::TopLeft,
+        &format_frequency(state.com2_state.active_freq, 3),
+    );
+    radio_panel.set_window(
+        Window::TopRight,
+        &format_frequency(state.com2_state.standby_freq, 3),
+    );
+    radio_panel.update_all_windows();
 }
 
 fn setup_simulator_event_ids(simulator: &mut SimConnector) {
