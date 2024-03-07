@@ -45,7 +45,7 @@ fn main() {
 
             match input.mode_selector_upper {
                 ModeSelectorState::ModeSelectorCom1 => {
-                    handle_com_frequency_input(
+                    handle_com_input(
                         &mut state.com1_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -66,7 +66,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
-                    handle_com_frequency_input(
+                    handle_com_input(
                         &mut state.com2_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -87,7 +87,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
-                    handle_nav_frequency_input(
+                    handle_nav_input(
                         &mut state.nav1_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -102,7 +102,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
-                    handle_nav_frequency_input(
+                    handle_nav_input(
                         &mut state.nav2_state,
                         input.button_upper,
                         input.rotary_upper_outer,
@@ -146,7 +146,7 @@ fn main() {
 
             match input.mode_selector_lower {
                 ModeSelectorState::ModeSelectorCom1 => {
-                    handle_com_frequency_input(
+                    handle_com_input(
                         &mut state.com1_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -167,7 +167,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorCom2 => {
-                    handle_com_frequency_input(
+                    handle_com_input(
                         &mut state.com2_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -189,7 +189,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav1 => {
-                    handle_nav_frequency_input(
+                    handle_nav_input(
                         &mut state.nav1_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -204,7 +204,7 @@ fn main() {
                     );
                 }
                 ModeSelectorState::ModeSelectorNav2 => {
-                    handle_nav_frequency_input(
+                    handle_nav_input(
                         &mut state.nav2_state,
                         input.button_lower,
                         input.rotary_lower_outer,
@@ -432,7 +432,7 @@ fn autopilot_logic(state: &AutopilotState, simulator: &SimConnector, radio_panel
     radio_panel.update_all_windows();
 }
 
-fn handle_com_frequency_input(
+fn handle_com_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
@@ -457,7 +457,7 @@ fn handle_com_frequency_input(
     frequency_state.standby_freq.fraction = wrap(frequency_state.standby_freq.fraction, 0, 1000);
 }
 
-fn handle_nav_frequency_input(
+fn handle_nav_input(
     frequency_state: &mut FrequencyState,
     swap_button: ButtonState,
     outer_rotary: RotaryState,
@@ -581,16 +581,11 @@ fn display_adf_values(
     window_standby: Window,
     radio_panel: &mut RadioPanel,
 ) -> bool {
-    radio_panel.set_window(
-        window_active,
-        &format!("{: >5}", adf_state.active_frequency),
-    );
-
+    radio_panel.set_window(window_active, "     ");
     radio_panel.set_window(
         window_standby,
         &format!("{: >5}", adf_state.standby_frequency),
     );
-
     radio_panel.update_all_windows();
 
     return true;
