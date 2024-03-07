@@ -147,7 +147,7 @@ fn handle_lower_panel(
         }
         ModeSelectorState::ModeSelectorAdf => {
             display_adf_values(
-                &mut state.adf_state,
+                &state.adf_state,
                 Window::BottomLeft,
                 Window::BottomRight,
                 radio_panel,
@@ -610,7 +610,7 @@ fn send_to_sim(
 }
 
 fn display_adf_values(
-    adf_state: &mut AdfState,
+    adf_state: &AdfState,
     window_active: Window,
     window_standby: Window,
     radio_panel: &mut RadioPanel,
