@@ -1,12 +1,6 @@
 use parse_int::parse;
 use radio_panel::{
-    constants::*,
-    device::*,
-    frequency::*,
-    input_states::*,
-    states::*,
-    utility::*,
-    windows::*,
+    constants::*, device::*, frequency::*, input_states::*, states::*, utility::*, windows::*,
 };
 use simconnect::{self, SimConnector};
 use std::{
@@ -43,8 +37,20 @@ fn main() {
                 continue;
             }
 
-            handle_upper_panel(input, &mut state, &mut radio_panel, &mut connected_to_sim, &simulator);
-            handle_lower_panel(input, &mut state, &mut radio_panel, &mut connected_to_sim, &simulator);
+            handle_upper_panel(
+                input,
+                &mut state,
+                &mut radio_panel,
+                &mut connected_to_sim,
+                &simulator,
+            );
+            handle_lower_panel(
+                input,
+                &mut state,
+                &mut radio_panel,
+                &mut connected_to_sim,
+                &simulator,
+            );
         } else {
             loop {
                 if simulator.connect("BetterRadioPanel") {
@@ -60,7 +66,13 @@ fn main() {
     }
 }
 
-fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
+fn handle_lower_panel(
+    input: InputState,
+    state: &mut InstrumentStates,
+    radio_panel: &mut RadioPanel,
+    connected_to_sim: &mut bool,
+    simulator: &SimConnector,
+) {
     match input.mode_selector_lower {
         ModeSelectorState::ModeSelectorCom1 => {
             apply_com_input(
@@ -164,7 +176,13 @@ fn handle_lower_panel(input: InputState, state: &mut InstrumentStates, radio_pan
     }
 }
 
-fn handle_upper_panel(input: InputState, state: &mut InstrumentStates, radio_panel: &mut RadioPanel, connected_to_sim: &mut bool, simulator: &SimConnector) {
+fn handle_upper_panel(
+    input: InputState,
+    state: &mut InstrumentStates,
+    radio_panel: &mut RadioPanel,
+    connected_to_sim: &mut bool,
+    simulator: &SimConnector,
+) {
     match input.mode_selector_upper {
         ModeSelectorState::ModeSelectorCom1 => {
             apply_com_input(
