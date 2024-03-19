@@ -577,16 +577,16 @@ fn apply_autopilot_input(
 }
 
 fn send_com_to_sim(
-    frequency_state: &mut FrequencyState,
+    com_state: &mut FrequencyState,
     simulator: &SimConnector,
     active_event_id: u32,
     standby_event_id: u32,
 ) -> bool {
     // More consise variable names
-    let active_integer = frequency_state.active_freq.integer;
-    let active_fract = frequency_state.active_freq.fraction;
-    let standby_integer = frequency_state.standby_freq.integer;
-    let standby_fract = frequency_state.standby_freq.fraction;
+    let active_integer = com_state.active_freq.integer;
+    let active_fract = com_state.active_freq.fraction;
+    let standby_integer = com_state.standby_freq.integer;
+    let standby_fract = com_state.standby_freq.fraction;
 
     // Format for FS2020
     let active_frequency =
