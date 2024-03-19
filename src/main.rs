@@ -589,10 +589,11 @@ fn send_com_to_sim(
     let standby_fract = frequency_state.standby_freq.fraction;
 
     // Format for FS2020
-    let active_frequency = format!("{:0>3}{:0>3}000", active_integer, active_fract);
-    let active_frequency = parse::<u32>(&active_frequency).unwrap();
-    let standby_frequency = format!("{:0>3}{:0>3}000", standby_integer, standby_fract);
-    let standby_frequency = parse::<u32>(&standby_frequency).unwrap();
+    let active_frequency =
+        parse::<u32>(&format!("{:0>3}{:0>3}000", active_integer, active_fract)).unwrap();
+    let standby_frequency =
+        parse::<u32>(&format!("{:0>3}{:0>3}000", standby_integer, standby_fract)).unwrap();
+
     if !simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0) {
         return false;
     };
