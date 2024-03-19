@@ -128,6 +128,12 @@ fn handle_upper_panel(
                 Window::TopRight,
                 2,
             );
+            *connected_to_sim = send_nav_to_sim(
+                &mut state.nav1_state,
+                simulator,
+                EVENT_ID_NAV1_RADIO_SET_HZ,
+                EVENT_ID_NAV1_STBY_SET_HZ,
+            );
         }
         ModeSelectorState::ModeSelectorNav2 => {
             apply_nav_input(
@@ -142,6 +148,12 @@ fn handle_upper_panel(
                 Window::TopLeft,
                 Window::TopRight,
                 2,
+            );
+            *connected_to_sim = send_nav_to_sim(
+                &mut state.nav1_state,
+                simulator,
+                EVENT_ID_NAV2_RADIO_SET_HZ,
+                EVENT_ID_NAV2_STBY_SET_HZ,
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
@@ -242,6 +254,12 @@ fn handle_lower_panel(
                 Window::BottomRight,
                 2,
             );
+            *connected_to_sim = send_nav_to_sim(
+                &mut state.nav1_state,
+                simulator,
+                EVENT_ID_NAV1_RADIO_SET_HZ,
+                EVENT_ID_NAV1_STBY_SET_HZ,
+            );
         }
         ModeSelectorState::ModeSelectorNav2 => {
             apply_nav_input(
@@ -256,6 +274,12 @@ fn handle_lower_panel(
                 Window::BottomLeft,
                 Window::BottomRight,
                 2,
+            );
+            *connected_to_sim = send_nav_to_sim(
+                &mut state.nav1_state,
+                simulator,
+                EVENT_ID_NAV2_RADIO_SET_HZ,
+                EVENT_ID_NAV2_STBY_SET_HZ,
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
@@ -581,17 +605,17 @@ fn send_com_to_sim(
     active_event_id: u32,
     standby_event_id: u32,
 ) -> bool {
-    // More consise variable names
-    let active_integer = com_state.active_freq.integer;
-    let active_fract = com_state.active_freq.fraction;
-    let standby_integer = com_state.standby_freq.integer;
-    let standby_fract = com_state.standby_freq.fraction;
-
     // Format for FS2020
-    let active_frequency =
-        parse::<u32>(&format!("{:0>3}{:0>3}000", active_integer, active_fract)).unwrap();
-    let standby_frequency =
-        parse::<u32>(&format!("{:0>3}{:0>3}000", standby_integer, standby_fract)).unwrap();
+    let active_frequency = parse::<u32>(&format!(
+        "{:0>3}{:0>3}000",
+        com_state.active_freq.integer, com_state.active_freq.fraction
+    ))
+    .unwrap();
+    let standby_frequency = parse::<u32>(&format!(
+        "{:0>3}{:0>3}000",
+        com_state.standby_freq.integer, com_state.standby_freq.fraction
+    ))
+    .unwrap();
 
     if !simulator.transmit_client_event(1, active_event_id, active_frequency, 5, 0) {
         return false;
@@ -601,6 +625,15 @@ fn send_com_to_sim(
     }
 
     true
+}
+
+fn send_nav_to_sim(
+    nav_state: &mut FrequencyState,
+    simulator: &SimConnector,
+    active_event_id: u32,
+    standby_event_id: u32,
+) -> bool {
+    return send_com_to_sim(nav_state, simulator, active_event_id, standby_event_id);
 }
 
 fn display_adf_values(
