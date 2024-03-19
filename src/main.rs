@@ -86,7 +86,7 @@ fn handle_lower_panel(
                 Window::BottomRight,
                 3,
             );
-            *connected_to_sim = send_to_sim(
+            *connected_to_sim = send_com_to_sim(
                 &mut state.com1_state,
                 simulator,
                 EVENT_ID_COM_RADIO_SET_HZ,
@@ -108,7 +108,7 @@ fn handle_lower_panel(
                 3,
             );
 
-            *connected_to_sim = send_to_sim(
+            *connected_to_sim = send_com_to_sim(
                 &mut state.com2_state,
                 simulator,
                 EVENT_ID_COM2_RADIO_SET_HZ,
@@ -201,7 +201,7 @@ fn handle_upper_panel(
                 Window::TopRight,
                 3,
             );
-            *connected_to_sim = send_to_sim(
+            *connected_to_sim = send_com_to_sim(
                 &mut state.com1_state,
                 simulator,
                 EVENT_ID_COM_RADIO_SET_HZ,
@@ -222,7 +222,7 @@ fn handle_upper_panel(
                 Window::TopRight,
                 3,
             );
-            *connected_to_sim = send_to_sim(
+            *connected_to_sim = send_com_to_sim(
                 &mut state.com2_state,
                 simulator,
                 EVENT_ID_COM2_RADIO_SET_HZ,
@@ -576,7 +576,7 @@ fn apply_autopilot_input(
     }
 }
 
-fn send_to_sim(
+fn send_com_to_sim(
     frequency_state: &mut FrequencyState,
     simulator: &SimConnector,
     active_event_id: u32,
