@@ -633,7 +633,7 @@ fn send_nav_to_sim(
     active_event_id: u32,
     standby_event_id: u32,
 ) -> bool {
-    return send_com_to_sim(nav_state, simulator, active_event_id, standby_event_id);
+    send_com_to_sim(nav_state, simulator, active_event_id, standby_event_id)
 }
 
 fn display_adf_values(
