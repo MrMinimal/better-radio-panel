@@ -22,7 +22,7 @@ pub struct AdfState {
 }
 
 pub struct DmeState {
-    pub distance: f32,
+    pub distance: f64,
 }
 
 pub struct XpdrState {

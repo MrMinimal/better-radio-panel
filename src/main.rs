@@ -165,6 +165,7 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorDme => {
+            state.dme_state.distance = read_dme_from_sim(&simulator);
             display_dme_on_hardware(
                 radio_panel,
                 &state.dme_state,
@@ -414,7 +415,9 @@ fn display_dme_on_hardware(
     window_active: Window,
     window_standby: Window,
 ) {
-    let formatted_distance = format!("   {:.1}", dme_state.distance);
+    let formatted_distance = format!("{:.1}", dme_state.distance);
+    let formatted_distance = format!("{:>6}", formatted_distance);
+    println!("{}", formatted_distance);
     radio_panel.set_window(window_active, &format_frequency(nav1_state.active_freq, 2));
     radio_panel.set_window(window_standby, &formatted_distance);
     radio_panel.update_all_windows();
@@ -670,4 +673,8 @@ fn show_standby_screen(radio_panel: &mut RadioPanel) {
         radio_panel.set_window(window, "-----");
     }
     radio_panel.update_all_windows();
+}
+
+fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
+    1242.555
 }
