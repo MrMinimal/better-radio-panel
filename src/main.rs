@@ -157,7 +157,7 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
-            display_adf_values(
+            display_adf_on_hardware(
                 &state.adf_state,
                 Window::TopLeft,
                 Window::TopRight,
@@ -283,7 +283,7 @@ fn handle_lower_panel(
             );
         }
         ModeSelectorState::ModeSelectorAdf => {
-            display_adf_values(
+            display_adf_on_hardware(
                 &state.adf_state,
                 Window::BottomLeft,
                 Window::BottomRight,
@@ -636,7 +636,7 @@ fn send_nav_to_sim(
     send_com_to_sim(nav_state, simulator, active_event_id, standby_event_id)
 }
 
-fn display_adf_values(
+fn display_adf_on_hardware(
     adf_state: &AdfState,
     window_active: Window,
     window_standby: Window,
