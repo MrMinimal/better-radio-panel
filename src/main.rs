@@ -292,6 +292,7 @@ fn handle_lower_panel(
             );
         }
         ModeSelectorState::ModeSelectorDme => {
+            state.dme_state.distance = read_dme_from_sim(simulator);
             display_dme_on_hardware(
                 radio_panel,
                 &state.dme_state,
