@@ -1,6 +1,8 @@
 use parse_int::parse;
 use radio_panel::{constants::*, device::*, frequency::*, hardware::*, states::*, utility::*};
-use simconnect::{self, SimConnector};
+use simconnect::{self, DispatchResult, SimConnector};
+use std::thread::sleep;
+use std::time::Duration;
 use std::{
     thread,
     time::{self},
@@ -675,6 +677,41 @@ fn show_standby_screen(radio_panel: &mut RadioPanel) {
     radio_panel.update_all_windows();
 }
 
+struct DataStruct {
+    dist: f64,
+}
+
 fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
-    1242.555
+    simulator.add_data_definition(
+        0,
+        "HSI DISTANCE",
+        "Nautical miles",
+        simconnect::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_FLOAT64,
+        u32::MAX,
+        0.0,
+    ); // Assign a sim variable to a client defined id
+    simulator.request_data_on_sim_object(
+        0,
+        0,
+        0,
+        simconnect::SIMCONNECT_PERIOD_SIMCONNECT_PERIOD_ONCE,
+        0,
+        0,
+        0,
+        0,
+    ); //request_id, define_id, object_id (user), period, falgs, origin, interval, limit - tells simconnect to send data for the defined id and on the user aircraft
+
+    let mut distance: f64 = 0.0;
+    match simulator.get_next_message() {
+        Ok(DispatchResult::SimObjectData(data)) => unsafe {
+            if data.dwDefineID == 0 {
+                let sim_data_ptr = std::ptr::addr_of!(data.dwData) as *const DataStruct;
+                let sim_data_value = std::ptr::read_unaligned(sim_data_ptr);
+                distance = sim_data_value.dist;
+            }
+        },
+        _ => (),
+    }
+
+    distance
 }
