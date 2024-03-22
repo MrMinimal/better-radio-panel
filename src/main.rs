@@ -704,10 +704,14 @@ fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
             if data.dwDefineID == 0 {
                 let sim_data_ptr = std::ptr::addr_of!(data.dwData) as *const DataStruct;
                 let sim_data_value = std::ptr::read_unaligned(sim_data_ptr);
-                distance = sim_data_value.dist.abs();
+                distance = sim_data_value.dist;
+                // if wrong CDI mode is selected, MSFS returns invalid values
+                if distance == 1.0 || distance == 0.0 || distance == -1.0 {
+                    distance = 0.0;
+                }
             }
         }
     }
 
-    distance
+    distance.abs()
 }
