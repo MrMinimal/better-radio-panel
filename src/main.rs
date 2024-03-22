@@ -150,7 +150,7 @@ fn handle_upper_panel(
                 2,
             );
             *connected_to_sim = send_nav_to_sim(
-                &mut state.nav1_state,
+                &mut state.nav2_state,
                 simulator,
                 EVENT_ID_NAV2_RADIO_SET_HZ,
                 EVENT_ID_NAV2_STBY_SET_HZ,
