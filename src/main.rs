@@ -1,8 +1,6 @@
 use parse_int::parse;
 use radio_panel::{constants::*, device::*, frequency::*, hardware::*, states::*, utility::*};
 use simconnect::{self, DispatchResult, SimConnector};
-use std::thread::sleep;
-use std::time::Duration;
 use std::{
     thread,
     time::{self},
@@ -419,7 +417,6 @@ fn display_dme_on_hardware(
 ) {
     let formatted_distance = format!("{:.1}", dme_state.distance);
     let formatted_distance = format!("{:>6}", formatted_distance);
-    println!("{}", formatted_distance);
     radio_panel.set_window(window_active, &format_frequency(nav1_state.active_freq, 2));
     radio_panel.set_window(window_standby, &formatted_distance);
     radio_panel.update_all_windows();
@@ -713,5 +710,5 @@ fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
         _ => (),
     }
 
-    distance
+    distance.abs()
 }
