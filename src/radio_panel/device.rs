@@ -198,7 +198,7 @@ impl RadioPanel {
         self.set_window(Window::TopLeft, "     ");
         self.set_window(Window::TopRight, "     ");
         self.set_window(Window::BottomLeft, "     ");
-        self.set_window(Window::TopLeft, "     ");
+        self.set_window(Window::BottomRight, "     ");
         self.update_all_windows();
     }
 }
