@@ -165,7 +165,7 @@ fn handle_upper_panel(
             );
         }
         ModeSelectorState::ModeSelectorDme => {
-            state.dme_state.distance = read_dme_from_sim(&simulator);
+            state.dme_state.distance = read_dme_from_sim(simulator);
             display_dme_on_hardware(
                 radio_panel,
                 &state.dme_state,
@@ -686,7 +686,7 @@ fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
         simconnect::SIMCONNECT_DATATYPE_SIMCONNECT_DATATYPE_FLOAT64,
         u32::MAX,
         0.0,
-    ); // Assign a sim variable to a client defined id
+    );
     simulator.request_data_on_sim_object(
         0,
         0,
@@ -696,18 +696,17 @@ fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
         0,
         0,
         0,
-    ); //request_id, define_id, object_id (user), period, falgs, origin, interval, limit - tells simconnect to send data for the defined id and on the user aircraft
+    );
 
     let mut distance: f64 = 0.0;
-    match simulator.get_next_message() {
-        Ok(DispatchResult::SimObjectData(data)) => unsafe {
+    if let Ok(DispatchResult::SimObjectData(data)) = simulator.get_next_message() {
+        unsafe {
             if data.dwDefineID == 0 {
                 let sim_data_ptr = std::ptr::addr_of!(data.dwData) as *const DataStruct;
                 let sim_data_value = std::ptr::read_unaligned(sim_data_ptr);
                 distance = sim_data_value.dist;
             }
-        },
-        _ => (),
+        }
     }
 
     distance.abs()
