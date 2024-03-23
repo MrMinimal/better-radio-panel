@@ -416,8 +416,14 @@ fn display_dme_on_hardware(
     window_active: Window,
     window_standby: Window,
 ) {
-    let formatted_distance = format!("{:.1}", dme_state.distance);
-    let formatted_distance = format!("{:>6}", formatted_distance);
+    let formatted_distance: String = match dme_state.distance {
+        Some(distance) => {
+            let formatted_distance = format!("{:.1}", distance);
+            let formatted_distance = format!("{:>6}", formatted_distance);
+            formatted_distance
+        }
+        None => "    -".to_string(),
+    };
     radio_panel.set_window(window_active, &format_frequency(nav1_state.active_freq, 2));
     radio_panel.set_window(window_standby, &formatted_distance);
     radio_panel.update_all_windows();
@@ -679,7 +685,7 @@ struct DataStruct {
     dist: f64,
 }
 
-fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
+fn read_dme_from_sim(simulator: &SimConnector) -> Option<f64> {
     simulator.add_data_definition(
         0,
         "HSI DISTANCE",
@@ -699,20 +705,23 @@ fn read_dme_from_sim(simulator: &SimConnector) -> f64 {
         0,
     );
 
-    let mut distance: f64 = 0.0;
+    let mut returned_distance = 0.0;
     if let Ok(DispatchResult::SimObjectData(data)) = simulator.get_next_message() {
         unsafe {
             if data.dwDefineID == 0 {
                 let sim_data_ptr = std::ptr::addr_of!(data.dwData) as *const DataStruct;
                 let sim_data_value = std::ptr::read_unaligned(sim_data_ptr);
-                distance = sim_data_value.dist;
-                // if wrong CDI mode is selected, MSFS returns invalid values
-                if distance == 1.0 || distance == 0.0 || distance == -1.0 {
-                    distance = 0.0;
-                }
+                let distance = sim_data_value.dist;
+
+                returned_distance = distance.abs();
             }
         }
     }
 
-    distance.abs()
+    // if wrong CDI mode is selected, MSFS returns invalid values
+    if returned_distance == 1.0 || returned_distance < 0.01 {
+        return None;
+    } else {
+        return Some(returned_distance);
+    }
 }

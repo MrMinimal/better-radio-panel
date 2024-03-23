@@ -22,7 +22,7 @@ pub struct AdfState {
 }
 
 pub struct DmeState {
-    pub distance: f64,
+    pub distance: Option<f64>,
 }
 
 pub struct XpdrState {
@@ -89,7 +89,7 @@ pub fn instruments_default_state() -> InstrumentStates {
             active_frequency: 123,
             standby_frequency: 123,
         },
-        dme_state: DmeState { distance: 0.0 },
+        dme_state: DmeState { distance: None },
         xpdr_state: XpdrState {
             code: [1, 0, 0, 0],
             selected_digit: 0,
