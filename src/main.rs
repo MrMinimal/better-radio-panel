@@ -187,6 +187,11 @@ fn handle_upper_panel(
                 Window::TopLeft,
                 Window::TopRight,
             );
+            *connected_to_sim = send_xpdr_to_sim(
+                &mut state.xpdr_state,
+                simulator,
+                EVENT_ID_XPNDR_SET,
+            );
         }
     }
 }
@@ -632,6 +637,19 @@ fn send_com_to_sim(
     if !simulator.transmit_client_event(1, standby_event_id, standby_frequency, 5, 0) {
         return false;
     }
+
+    true
+}
+
+fn send_xpdr_to_sim(
+    xpdr_state: &mut XpdrState,
+    simulator: &SimConnector,
+    xpdr_event_id: u32,
+) -> bool {
+    let code = xpdr_state.code.map(|d| d.to_string()).join("");
+    let hex = format!("0x{}", code);
+    let hex = parse::<u32>(&hex).unwrap();
+    simulator.transmit_client_event(1, xpdr_event_id, hex, 5, 0);
 
     true
 }
