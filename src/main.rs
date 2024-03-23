@@ -720,8 +720,8 @@ fn read_dme_from_sim(simulator: &SimConnector) -> Option<f64> {
 
     // if wrong CDI mode is selected, MSFS returns invalid values
     if returned_distance == 1.0 || returned_distance < 0.01 {
-        return None;
+        None
     } else {
-        return Some(returned_distance);
+        Some(returned_distance)
     }
 }
