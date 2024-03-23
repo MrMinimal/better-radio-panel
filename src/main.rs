@@ -319,6 +319,11 @@ fn handle_lower_panel(
                 Window::BottomLeft,
                 Window::BottomRight,
             );
+            *connected_to_sim = send_xpdr_to_sim(
+                &mut state.xpdr_state,
+                simulator,
+                EVENT_ID_XPNDR_SET,
+            );
         }
     }
 }
