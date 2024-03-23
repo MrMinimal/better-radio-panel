@@ -649,9 +649,7 @@ fn send_xpdr_to_sim(
     let code = xpdr_state.code.map(|d| d.to_string()).join("");
     let hex = format!("0x{}", code);
     let hex = parse::<u32>(&hex).unwrap();
-    simulator.transmit_client_event(1, xpdr_event_id, hex, 5, 0);
-
-    true
+    simulator.transmit_client_event(1, xpdr_event_id, hex, 5, 0)
 }
 
 fn send_nav_to_sim(
