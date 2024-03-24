@@ -51,7 +51,7 @@ impl RadioPanel {
                 .unwrap()
                 .open(VENDOR_ID, PRODUCT_ID)
                 .unwrap_or_else(|_error| {
-                    println!("Couldn't connect to Radio Panel. Is it plugged in? Do you have permissions to access it?");
+                    println!("Couldn't connect to hardware. Is it plugged in?");
                     process::exit(1);
                 }),
             windows: [RadioPanelWindow {
