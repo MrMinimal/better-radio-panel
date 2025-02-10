@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 hidapi = "1.2.5"
-simconnect = "0.3.0"
+simconnect = "0.3.2"
 parse_int = "0.6.0"
 
 [profile.release]
